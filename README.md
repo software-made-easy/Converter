@@ -13,19 +13,18 @@ Converter, as the name suggests, is a simple and easy program to convert strings
 
 1. [Features](#features)
 2. [Preview](#preview)
-3. <!-- [Dependencies](#dependencies)-->
+3. [Dependencies](#dependencies)
 
 -------
 
 ## Features:
 
-- <!-- Save and load files -->
+- Save and load files
 - Undo-Redo
 - Preview converted strings in real time (<1 ms)
 - Syntax highlighting editor
-- <!-- Auto-complete (close brackets, list, ...) -->
 - Poor in resources
-- <!-- Quick opening of recent files (Button in toolbar or in the file menu) -->
+- Quick opening of recent files (Button in toolbar or in the file menu)
 - Open source
 - Native look and feel
 
@@ -38,15 +37,12 @@ Converter, as the name suggests, is a simple and easy program to convert strings
 
 <!-- ![Example](doc/images/Example.png) -->
 
-<!--
 ## Preview
 
 A preview is available [here](https://software-made-easy.github.io/Converter/converter.html).
 
 Important:
 - Performance might be bad
-- Some functions such as spellchecking are not available
--->
 
 ## Dependencies:
 
@@ -55,7 +51,6 @@ Important:
 ## Note(s):
 
 - To improve performance when using images, disable the "Auto add file path to icon path" option (menu <u>V</u>iew).
-
 
 -------
 
