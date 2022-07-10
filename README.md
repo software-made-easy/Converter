@@ -35,7 +35,7 @@ Converter, as the name suggests, is a simple and easy program to convert strings
 | **HTML**     	|               Markdown<br>Plain               	|
 | **C string** 		|                     Plain                     	|
 
-![Example](doc/images/Example.png)
+![Example](docs/images/Example.png)
 
 ## Preview
 
@@ -46,7 +46,7 @@ Important:
 
 ## Dependencies:
 
-[Qt](https://qt.io/) and [enchant-2](https://github.com/AbiWord/enchant).
+[Qt](https://qt.io/).
 
 -------
 
@@ -55,7 +55,7 @@ Important:
 Run the [build script](scripts/build.sh) or follow the instructions below.
 
 - Clone Converter: `git clone https://github.com/software-made-easy/Converter --depth=1 && cd Converter`
-- Clone all repositories required by MarkdownEdit by running the command `git submodule update --init --recursive -j 3 --depth=1`.
+- Clone all repositories required by Converter by running the command `git submodule update --init --recursive -j 3 --depth=1`.
 - Create the build folder: `mkdir build && cd build`.
 - Now create a Makefile with CMake: `cmake ..`.
 - Build it: `cmake --build . -j4`
@@ -72,4 +72,3 @@ cmake --build . -j4
 ## Credits
 
 - The conversion from Markdown to HTML is done with the help of the [md4c](https://github.com/mity/md4c) - library by *Martin Mitáš*.
-- <!-- The [widget](https://github.com/pbek/qmarkdowntextedit) used for writing was created by *Patrizio Bekerle*. -->
