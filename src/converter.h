@@ -27,7 +27,7 @@ public:
 
     QString c2Plain(QString);
 
-    // options for To::toCString
+    // Options for To::toCString
     bool multiLine = true;
     bool escapePercent = false;
 

@@ -35,7 +35,7 @@ Converter, as the name suggests, is a simple and easy program to convert strings
 | **HTML**     	|               Markdown<br>Plain               	|
 | **C string** 		|                     Plain                     	|
 
-<!-- ![Example](doc/images/Example.png) -->
+![Example](doc/images/Example.png)
 
 ## Preview
 
@@ -47,10 +47,6 @@ Important:
 ## Dependencies:
 
 [Qt](https://qt.io/) and [enchant-2](https://github.com/AbiWord/enchant).
-
-## Note(s):
-
-- To improve performance when using images, disable the "Auto add file path to icon path" option (menu <u>V</u>iew).
 
 -------
 

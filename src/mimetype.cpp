@@ -20,7 +20,7 @@ const QIcon MimeType::icon()
     QMimeType currMime = TypeParser::mimeForTo(currTo);
 
     if (currMime.isValid()) {
-        return TypeParser().iconForMime(currMime);
+        return TypeParser::iconForMime(currMime);
     }
     else if (currTo == To::toCString)
             return QIcon::fromTheme(QStringLiteral("text-x-csrc"),

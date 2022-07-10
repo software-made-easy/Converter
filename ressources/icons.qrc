@@ -28,5 +28,6 @@
         <file>icons/text-x-csrc.png</file>
         <file>icons/sort-name.svg</file>
         <file>icons/md5.png</file>
+        <file>icons/text-plain.png</file>
     </qresource>
 </RCC>
