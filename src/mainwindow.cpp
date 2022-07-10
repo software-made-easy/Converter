@@ -144,6 +144,11 @@ void MainWindow::onToChanged()
 {
     currentTo = To(ui->to->currentData().toInt());
 
+    if (currentTo == To::toHTML)
+        htmlHighliter->setDocument(ui->textEdit->document());
+    else
+        htmlHighliter->setDocument(nullptr);
+
     ui->menu_Options->clear();
     if (currentTo == To::toCString) {
         ui->menu_Options->addActions(QList<QAction*>({ui->actionescape_character_to_for_printf_formatting_string,
