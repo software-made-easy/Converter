@@ -1,0 +1,6 @@
+[submodule "3rdparty/QSourceHighlite"]
+	path = 3rdparty/QSourceHighlite
+	url = https://github.com/Waqar144/QSourceHighlite
+[submodule "3rdparty/md4c"]
+	path = 3rdparty/md4c
+	url = https://github.com/mity/md4c

@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>default.md</file>
+        <file>Icon.svg</file>
+        <file>Icon_dark.svg</file>
+        <file>syntax_de.md</file>
+        <file>syntax_en.md</file>
+    </qresource>
+</RCC>
