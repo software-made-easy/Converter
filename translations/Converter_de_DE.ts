@@ -4,38 +4,38 @@
 <context>
     <name>About</name>
     <message>
-        <location filename="../src/about.cpp" line="21"/>
-        <location filename="../src/about.cpp" line="168"/>
+        <location filename="../src/about.cpp" line="20"/>
+        <location filename="../src/about.cpp" line="129"/>
         <source>About</source>
         <translation>Über</translation>
     </message>
     <message>
-        <location filename="../src/about.cpp" line="149"/>
+        <location filename="../src/about.cpp" line="115"/>
         <source>Description:</source>
         <translation>Beschreibung:</translation>
     </message>
     <message>
-        <location filename="../src/about.cpp" line="154"/>
+        <location filename="../src/about.cpp" line="119"/>
         <source>Version:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/about.cpp" line="158"/>
+        <location filename="../src/about.cpp" line="122"/>
         <source>Homepage:</source>
         <translation>Startseite:</translation>
     </message>
     <message>
-        <location filename="../src/about.cpp" line="162"/>
+        <location filename="../src/about.cpp" line="125"/>
         <source>Qt Version:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/about.cpp" line="170"/>
+        <location filename="../src/about.cpp" line="132"/>
         <source>Credits</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/about.cpp" line="809"/>
+        <location filename="../src/about.cpp" line="771"/>
         <source>License</source>
         <translation>Lizenz</translation>
     </message>
@@ -49,50 +49,50 @@ Would you like to reload them?</source>
 Möchten Sie sie neu laden?</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="313"/>
+        <location filename="../src/mainwindow.cpp" line="315"/>
         <source>Print Document</source>
         <translation>Dokument drucken</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="361"/>
-        <location filename="../src/mainwindow.cpp" line="508"/>
-        <location filename="../src/mainwindow.cpp" line="519"/>
-        <location filename="../src/mainwindow.cpp" line="575"/>
+        <location filename="../src/mainwindow.cpp" line="363"/>
+        <location filename="../src/mainwindow.cpp" line="507"/>
+        <location filename="../src/mainwindow.cpp" line="518"/>
+        <location filename="../src/mainwindow.cpp" line="574"/>
         <source>Warning</source>
         <translation>Warnung</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="362"/>
+        <location filename="../src/mainwindow.cpp" line="364"/>
         <source>Could not create temporary file: %1</source>
         <translation>Temporäre Datei konnte nicht erstellt werden: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="396"/>
+        <location filename="../src/mainwindow.cpp" line="398"/>
         <source>Couldn&apos;t open file</source>
         <translation>Datei konnte nicht geöffnet werden</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="397"/>
+        <location filename="../src/mainwindow.cpp" line="399"/>
         <source>Could not open file %1: %2</source>
         <translation>Datei %1 konnte nicht geöffnet werden: %2</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="404"/>
+        <location filename="../src/mainwindow.cpp" line="406"/>
         <source>Large file</source>
         <translation>Große Datei</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="405"/>
+        <location filename="../src/mainwindow.cpp" line="407"/>
         <source>This is a large file that can potentially cause performance issues.</source>
         <translation>Dies ist eine große Datei, die potenziell Leistungsprobleme verursachen kann.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="478"/>
+        <location filename="../src/mainwindow.cpp" line="477"/>
         <source>Open File</source>
         <translation>Datei öffnen</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="541"/>
+        <location filename="../src/mainwindow.cpp" line="540"/>
         <source>Save File</source>
         <translation>Datei speichern</translation>
     </message>
@@ -223,7 +223,8 @@ Möchten Sie sie neu laden?</translation>
     </message>
     <message>
         <location filename="../ui/mainwindow.ui" line="263"/>
-        <location filename="../src/mainwindow.cpp" line="419"/>
+        <location filename="../src/mainwindow.cpp" line="421"/>
+        <location filename="../src/mainwindow.cpp" line="454"/>
         <source>Reload &quot;%1&quot;</source>
         <translation>„%1“ neu laden</translation>
     </message>
@@ -279,20 +280,26 @@ Möchten Sie sie neu laden?</translation>
         <translation>Trimmen</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="422"/>
+        <location filename="../src/mainwindow.cpp" line="424"/>
+        <location filename="../src/mainwindow.cpp" line="457"/>
         <source>Opened %1</source>
         <translation>%1 geöffnet</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="509"/>
-        <location filename="../src/mainwindow.cpp" line="520"/>
+        <location filename="../src/mainwindow.cpp" line="508"/>
+        <location filename="../src/mainwindow.cpp" line="519"/>
         <source>Could not write to file %1: %2</source>
         <translation>In Datei %1 konnte nicht geschrieben werden: %2</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="527"/>
+        <location filename="../src/mainwindow.cpp" line="526"/>
         <source>Wrote %1</source>
         <translation>%1 geschrieben</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="561"/>
+        <source>Simple program for converting strings</source>
+        <translation>Einfaches Programm zum Konvertieren von Zeichenketten</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="564"/>
@@ -300,19 +307,19 @@ Möchten Sie sie neu laden?</translation>
         <translation>&lt;p&gt;Die Konvertierung von Markdown nach HTML erfolgt mit Hilfe der &lt;a href=&quot;https://github.com/mity/md4c&quot;&gt;md4c&lt;/a&gt;-Bibliothek von &lt;em&gt;Martin Mitáš&lt;/em&gt; .&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="576"/>
+        <location filename="../src/mainwindow.cpp" line="575"/>
         <source>This file could not be found:
 %1.</source>
         <translation>Diese Datei konnte nicht gefunden werden:
 %1.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="623"/>
+        <location filename="../src/mainwindow.cpp" line="622"/>
         <source>Save changes?</source>
         <translation>Änderungen speichern?</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="624"/>
+        <location filename="../src/mainwindow.cpp" line="623"/>
         <source>The file &lt;em&gt;%1&lt;/em&gt; has been changed.
 Do you want to leave anyway?</source>
         <translation>Die Datei &lt;em&gt;%1&lt;/em&gt; wurde geändert.

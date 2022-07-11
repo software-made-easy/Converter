@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
     parser.addHelpOption();
     parser.addVersionOption();
     parser.setApplicationDescription(QCoreApplication::translate(
-        "main", "Simple program for editing Markdown files"
+        "MainWindow", "Simple program for converting strings"
 
         ));
     parser.addPositionalArgument("file", QCoreApplication::translate(

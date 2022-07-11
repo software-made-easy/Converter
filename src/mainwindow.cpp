@@ -557,11 +557,11 @@ bool MainWindow::onFileSaveAs()
 void MainWindow::onHelpAbout()
 {
     About dialog(this);
-    dialog.setAppUrl("https://github.com/software-made-easy/Converter");
+    dialog.setAppUrl(QStringLiteral("https://software-made-easy.github.io/Converter/"));
     dialog.setDescription(tr("Simple program for converting strings"));
 
+
     dialog.addCredit(tr("<p>The conversion from Markdown to HTML is done with the help of the <a href=\"https://github.com/mity/md4c\">md4c</a> library by <em>Martin Mitáš</em>.</p>"));
-    // dialog.addCredit(tr("<p>The <a href=\"https://github.com/pbek/qmarkdowntextedit\">widget</a> used for writing was created by <em>Patrizio Bekerle</em>.</p>"));
 
     dialog.exec();
 }

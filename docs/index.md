@@ -1,4 +1,12 @@
-Converter, as the name suggests, is a simple and easy program to convert strings.
+![Made with C++](https://forthebadge.com/images/badges/made-with-c-plus-plus.svg)
+[![Powered by Qt](https://forthebadge.com/images/badges/powered-by-qt.svg)](https://qt.io)
+[![CodeFactor](https://www.codefactor.io/repository/github/software-made-easy/converter/badge/main)](https://www.codefactor.io/repository/github/software-made-easy/converter/overview/main)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
+
+# Converter
+
+Converter is a simple program for converting strings.
 
 ## Table of contents
 
