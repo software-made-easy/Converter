@@ -178,13 +178,9 @@ QString Converter::c2Plain(QString in)
 {
     QString out;
 
-    if (in.startsWith(QChar('"')))
-        in.remove(0, 1);
-    if (in.endsWith(QChar('"')))
-        in.remove(in.length() -1, 1);
-
-    in.replace(QLatin1String("\\\\"), QChar('\\'));
-    in.replace(QLatin1String("\\\""), QChar('"'));
+    in.replace(QLatin1String("\\\""), QChar('"'));  // Replace \" with "
+    in.replace(QLatin1String("\\n"), QChar('\n')); // Replace \\n with line breaks
+    in.replace(QLatin1String("\\\\"), QChar('\\')); // Replace \\ with \
 
     if (escapePercent)
         in.replace(QLatin1String("%%"), QChar('%'));
@@ -193,10 +189,12 @@ QString Converter::c2Plain(QString in)
     for (QString line : list) {
         line = line.trimmed();
 
-        if (line.startsWith(QChar('"')))
-            line.remove(0, 1);
-        if (line.endsWith(QChar('"')))
-            line.remove(line.length() -1, 1);
+        if (line.length() > 1) {
+            if (line.startsWith(QChar('"')))
+                line.remove(0, 1);
+            if (line.endsWith(QChar('"')))
+                line.remove(line.length() -1, 1);
+        }
 
         out.append(line);
         out.append(QChar('\n'));
