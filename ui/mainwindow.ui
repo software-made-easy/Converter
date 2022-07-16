@@ -337,6 +337,28 @@
     <string>Trimm</string>
    </property>
   </action>
+  <action name="actionSort_numbers">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Sort numbers</string>
+   </property>
+   <property name="toolTip">
+    <string>Sort numbers (slower)</string>
+   </property>
+  </action>
+  <action name="actionCase_sensetive">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Case sensitive</string>
+   </property>
+   <property name="toolTip">
+    <string>Case sensetive</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

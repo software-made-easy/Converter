@@ -50,26 +50,14 @@ MainWindow::MainWindow(const QString &file, QWidget *parent)
     toolbutton->setMenu(ui->menuRecentlyOpened);
     toolbutton->setPopupMode(QToolButton::InstantPopup);
 
-#ifndef NO_THREADING
-#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
-    QFuture<void> retVal = QtConcurrent::run(&MainWindow::loadIcons, this);
-    QFuture<void> retVal2 = QtConcurrent::run(&MainWindow::setupThings, this);
-#else
-    QtConcurrent::run(this, &MainWindow::loadIcons);
-    QtConcurrent::run(this, &MainWindow::setupThings);
-#endif
-#else
     loadIcons();
     setupThings();
-#endif
 
     settings = new QSettings(QStringLiteral("SME"),
                              QStringLiteral("Converter"), this);
 
     loadSettings(file);
     updateOpened();
-
-    converter = new Converter(this);
 
     connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::onFileOpen);
     connect(ui->actionSave, &QAction::triggered, this, &MainWindow::onFileSave);
@@ -118,8 +106,6 @@ MainWindow::MainWindow(const QString &file, QWidget *parent)
     ui->menuFile->removeAction(ui->actionPrint);
     ui->menuFile->removeAction(ui->actionPrintPreview);
 #endif
-
-    htmlHighliter = new Highliter(ui->plainTextEdit->document());
 }
 
 void MainWindow::setText(const QString &html)
@@ -156,7 +142,8 @@ void MainWindow::onToChanged()
     }
     else if (currentTo == To::toSorted) {
         ui->menu_Options->addActions(QList<QAction*>({ui->actionSort, ui->actionSkip_empty,
-                                                     ui->actionTrimm, ui->actionRemove_duplicates}));
+                                                     ui->actionTrimm, ui->actionRemove_duplicates,
+                                                     ui->actionSort_numbers, ui->actionCase_sensetive}));
     }
 
     emit ui->textEdit->textChanged();
@@ -169,6 +156,9 @@ void MainWindow::onFileReload()
 
 void MainWindow::setupThings()
 {
+    htmlHighliter = new Highliter(ui->plainTextEdit->document());
+    converter = new Converter(this);
+
     connect(ui->from, qOverload<int>(&QComboBox::currentIndexChanged),
             this, &MainWindow::onFromChanged);
     connect(ui->to, qOverload<int>(&QComboBox::currentIndexChanged),
@@ -214,6 +204,9 @@ void MainWindow::setupThings()
     if (ui->actionSaveAs->shortcuts().isEmpty())
         ui->actionSaveAs->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_S));
 
+    ui->actionCase_sensetive->setChecked(converter->caseSensetice);
+    ui->actionSort_numbers->setChecked(converter->sortNumbers);
+
     connect(ui->actionSplit_output_into_multiple_lines, &QAction::triggered,
             this, [this](const bool &c){ converter->multiLine = c; onTextChanged(); });
     connect(ui->actionescape_character_to_for_printf_formatting_string, &QAction::triggered,
@@ -226,6 +219,10 @@ void MainWindow::setupThings()
             this, [this](const bool &c){ converter->skipEmpty = c; onTextChanged(); });
     connect(ui->actionTrimm, &QAction::triggered,
             this, [this](const bool &c){ converter->trimm = c; onTextChanged(); });
+    connect(ui->actionCase_sensetive, &QAction::triggered,
+            this, [this](const bool &c){ converter->caseSensetice = c; onTextChanged(); });
+    connect(ui->actionSort_numbers, &QAction::triggered,
+            this, [this](const bool &c){ converter->sortNumbers = c; onTextChanged(); });
 }
 
 void MainWindow::loadIcons()

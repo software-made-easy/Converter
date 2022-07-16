@@ -1,8 +1,38 @@
 #include "converter.h"
 #include "markdownparser.h"
 
+#include "qdebug.h"
+
 #include <QTextDocument>
 
+
+bool sortSensitive(const QString &s1, const QString& s2)
+{
+    bool ok = false;
+    bool ok2 = false;
+
+    const int i = s1.toInt(&ok);
+    const int i2 = s2.toInt(&ok2);
+
+    if (ok && ok2)
+        return i < i2;
+
+    return std::lexicographical_compare(s1.begin(), s1.end(), s2.begin(), s2.end());
+}
+
+bool sortInsensitive(const QString &s1, const QString& s2)
+{
+    bool ok = false;
+    bool ok2 = false;
+
+    const int i = s1.toInt(&ok);
+    const int i2 = s2.toInt(&ok2);
+
+    if (ok && ok2)
+        return i < i2;
+
+    return s1.compare(s2, Qt::CaseSensitivity::CaseInsensitive) < 0;
+}
 
 Converter::Converter(QObject *parent)
     : QThread{parent}
@@ -148,8 +178,19 @@ QString Converter::plain2Sorted(const QString &in)
 {
     QStringList list = in.split(QChar('\n'));
 
-    if (sort)
-        list.sort();
+    if (sort) {
+        if (sortNumbers) {
+            if (caseSensetice)
+                std::sort(list.begin(), list.end(), sortSensitive);
+            else
+                std::sort(list.begin(), list.end(), sortInsensitive);
+        }
+        else if (caseSensetice)
+            list.sort();
+        else
+            list.sort(Qt::CaseInsensitive);
+    }
+
     if (removeDuplicates)
         list.removeDuplicates();
 
@@ -185,7 +226,7 @@ QString Converter::c2Plain(QString in)
     if (escapePercent)
         in.replace(QLatin1String("%%"), QChar('%'));
 
-    QStringList list = in.split(QChar('\n'));
+    const QStringList list = in.split(QChar('\n'));
     for (QString line : list) {
         line = line.trimmed();
 

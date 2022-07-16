@@ -18,16 +18,6 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Pri
 
 if (EMSCRIPTEN)
     add_compile_definitions(NO_THREADING)
-
-    set(CONCURRENT
-        ""
-    )
-else()
-    find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Concurrent)
-
-    set(CONCURRENT
-        Qt${QT_VERSION_MAJOR}::Concurrent
-    )
 endif()
 
 set(TS_FILES translations/Converter_de_DE.ts)
@@ -36,7 +26,6 @@ set(RC_FILES
     ressources/ressources.qrc
     translations/translations.qrc
 )
-
 
 include(3rdparty/CMakeLists.txt)
 include(cmake/TranslationUtils.cmake)
@@ -97,7 +86,7 @@ IF(WIN32)
 ENDIF(WIN32)
 
 target_include_directories(converter PRIVATE ${CMAKE_SOURCE_DIR}/src)
-target_link_libraries(converter PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Svg Qt${QT_VERSION_MAJOR}::PrintSupport ${CONCURRENT} ${INTL_LDFLAGS} ${3rdparty})
+target_link_libraries(converter PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Svg Qt${QT_VERSION_MAJOR}::PrintSupport ${INTL_LDFLAGS} ${3rdparty})
 
 target_compile_definitions(converter PUBLIC APP_VERSION="${PROJECT_VERSION}" QT_DISABLE_DEPRECATED_BEFORE=0x051208)
 

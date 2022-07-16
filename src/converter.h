@@ -15,6 +15,8 @@ public:
     explicit Converter(QObject *parent = nullptr);
     ~Converter() { quit(); };
 
+    bool compare(const QString &, const QString &);
+
     QString markdown2HTML(const QString &);
     QString markdown2Plain(const QString &);
 
@@ -36,6 +38,8 @@ public:
     bool sort = true;
     bool skipEmpty = true;
     bool trimm = true;
+    bool sortNumbers = false;
+    bool caseSensetice = true;
 
 public slots:
     void convert(const QString &, const From &, const To &);
