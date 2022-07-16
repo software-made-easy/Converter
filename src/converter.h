@@ -15,8 +15,6 @@ public:
     explicit Converter(QObject *parent = nullptr);
     ~Converter() { quit(); };
 
-    bool compare(const QString &, const QString &);
-
     QString markdown2HTML(const QString &);
     QString markdown2Plain(const QString &);
 
