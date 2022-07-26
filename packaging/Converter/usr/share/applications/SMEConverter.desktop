@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=SMEConverter
+GenericName=SMEConverter
+Comment=Start SMEConverter
+Comment[de]=Starte SMEConverter
+Exec=/usr/bin/smeconverter %f
+Icon=text-markdown
+Terminal=false
+Type=Application
+Categories=Utility; Qt
+MimeType=text/plain; text/html

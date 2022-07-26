@@ -31,7 +31,7 @@ Converter is a simple program for converting strings.
 | **Plain**    		| C-string<br>Sorted<br>MD5<br>SHA256<br>SHA512 	|
 | **Markdown** 	|                 HTML<br>Plain                 	|
 | **HTML**     	|               Markdown<br>Plain               	|
-| **C string** 		|                     Plain                     	|
+| **C- string** 		|                     Plain                     	|
 
 ![Example](https://github.com/software-made-easy/Converter/raw/main/docs/images/Example.png)
 

@@ -12,14 +12,14 @@ QT_END_NAMESPACE
 class MimeType
 {
 public:
-    MimeType(QObject *parent = nullptr);
-    explicit MimeType(const To &, QObject *parent = nullptr);
+    MimeType();
+    explicit MimeType(const To &);
     ~MimeType() {};
 
     const QIcon icon();
     const QString comment();
 
-    inline const To type() { return currTo; };
+    inline const To type() const { return currTo; };
 
 private:
     To currTo = To::toInvalid;

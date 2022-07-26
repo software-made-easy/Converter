@@ -12,8 +12,8 @@ set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_SOURCE_DIR}/ui)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools PrintSupport Svg)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools PrintSupport Svg)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools PrintSupport)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools PrintSupport)
 
 
 if (EMSCRIPTEN)
@@ -64,6 +64,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ${APP_RES}
     )
 
+    set_property(TARGET converter APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
+                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
+
 else()
     qt5_add_translation(QM_FILES ${TS_FILES})
     add_app_translations_resource(APP_RES ${QM_FILES})
@@ -73,6 +76,9 @@ else()
             ${PROJECT_SOURCES}
             ${APP_RES}
         )
+
+        set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
+
     else()
         add_executable(converter
             ${PROJECT_SOURCES}
@@ -86,7 +92,7 @@ IF(WIN32)
 ENDIF(WIN32)
 
 target_include_directories(converter PRIVATE ${CMAKE_SOURCE_DIR}/src)
-target_link_libraries(converter PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Svg Qt${QT_VERSION_MAJOR}::PrintSupport ${INTL_LDFLAGS} ${3rdparty})
+target_link_libraries(converter PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::PrintSupport ${INTL_LDFLAGS} ${3rdparty})
 
 target_compile_definitions(converter PUBLIC APP_VERSION="${PROJECT_VERSION}" QT_DISABLE_DEPRECATED_BEFORE=0x051208)
 
@@ -97,11 +103,6 @@ set_target_properties(converter PROPERTIES
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
 )
-
-if(ANDROID)
-    set_property(TARGET converter APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
-        ${CMAKE_CURRENT_SOURCE_DIR}/android)
-endif()
 
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(converter)

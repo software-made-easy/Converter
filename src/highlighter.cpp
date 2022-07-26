@@ -6,24 +6,20 @@
 Highliter::Highliter(QTextDocument *doc)
     : QSyntaxHighlighter(doc)
 {
-    QTextCharFormat format = QTextCharFormat();
+    QTextCharFormat format;
 
     _formats[Token::CodeBlock] = format;
 
     format.setForeground(QColor(249, 38, 114));
     _formats[Token::CodeKeyWord] = format;
-    format = QTextCharFormat();
+    format.clearForeground();
 
     format.setForeground(QColor(163, 155, 78));
     _formats[Token::CodeString] = format;
-    format = QTextCharFormat();
+    format.clearForeground();
 
     format.setForeground(QColor(1, 138, 15));
     _formats[Token::CodeBuiltIn] = format;
-}
-
-void Highliter::setTo(const To &to)
-{
 }
 
 void Highliter::highlightBlock(const QString &text)

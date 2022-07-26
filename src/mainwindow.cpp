@@ -25,10 +25,6 @@
 #include <QScreen>
 #include <QMimeDatabase>
 
-#ifndef NO_THREADING
-#include <QtConcurrent/QtConcurrentRun>
-#endif
-
 #if QT_CONFIG(printdialog)
 #include <QtPrintSupport/QPrintDialog>
 #include <QtPrintSupport/QPrintPreviewDialog>
@@ -56,12 +52,10 @@ MainWindow::MainWindow(const QString &file, QWidget *parent)
     settings = new QSettings(QStringLiteral("SME"),
                              QStringLiteral("Converter"), this);
 
-    loadSettings(file);
+    loadSettings();
     updateOpened();
 
     connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::onFileOpen);
-    connect(ui->actionSave, &QAction::triggered, this, &MainWindow::onFileSave);
-    connect(ui->actionSaveAs, &QAction::triggered, this, &MainWindow::onFileSaveAs);
     connect(ui->actionExit, &QAction::triggered, this, &QWidget::close);
     connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::onHelpAbout);
     connect(ui->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
@@ -71,14 +65,8 @@ MainWindow::MainWindow(const QString &file, QWidget *parent)
     connect(ui->actionCopy, &QAction::triggered, this, &MainWindow::copy);
     connect(ui->actionPaste, &QAction::triggered, this, &MainWindow::paste);
 
-    connect(ui->actionPause_preview, &QAction::triggered,
-            this, &MainWindow::pausePreview);
     connect(ui->actionWord_wrap, &QAction::triggered,
             this, &MainWindow::changeWordWrap);
-    connect(ui->actionReload, &QAction::triggered,
-            this, &MainWindow::onFileReload);
-    connect(ui->actionOpen_in_web_browser, &QAction::triggered,
-            this, &MainWindow::openInWebBrowser);
     connect(ui->actionSelectAll, &QAction::triggered,
             this, &MainWindow::selectAll);
     connect(ui->actionRedo, &QAction::triggered,
@@ -90,22 +78,29 @@ MainWindow::MainWindow(const QString &file, QWidget *parent)
     connect(converter, &Converter::htmlReady,
             this, &MainWindow::setText);
 
-    ui->actionSave->setEnabled(false);
     ui->actionUndo->setEnabled(false);
     ui->actionRedo->setEnabled(false);
 
     ui->File->addAction(ui->actionOpen);
-    ui->File->addAction(ui->actionSave);
     ui->File->addSeparator();
     ui->File->addWidget(toolbutton);
 
 #ifndef Q_OS_WASM
     ui->File->addSeparator();
     ui->File->addAction(ui->actionPrintPreview);
-#else
-    ui->menuFile->removeAction(ui->actionPrint);
-    ui->menuFile->removeAction(ui->actionPrintPreview);
 #endif
+
+    ui->toolBarEdit->addAction(ui->actionUndo);
+    ui->toolBarEdit->addAction(ui->actionRedo);
+    ui->toolBarEdit->addAction(ui->actionCut);
+    ui->toolBarEdit->addAction(ui->actionCopy);
+    ui->toolBarEdit->addAction(ui->actionPaste);
+    ui->toolBarEdit->addAction(ui->actionSelectAll);
+
+    if (!file.isEmpty())
+        QMetaObject::invokeMethod(this, [file, this] {
+            openFile(file);
+        }, Qt::QueuedConnection);
 }
 
 void MainWindow::setText(const QString &html)
@@ -131,11 +126,12 @@ void MainWindow::onToChanged()
     currentTo = To(ui->to->currentData().toInt());
 
     if (currentTo == To::toHTML)
-        htmlHighliter->setDocument(ui->textEdit->document());
+        htmlHighliter->setDocument(ui->plainTextEdit->document());
     else
         htmlHighliter->setDocument(nullptr);
 
     ui->menu_Options->clear();
+    ui->menu_Options->setEnabled(true);
     if (currentTo == To::toCString) {
         ui->menu_Options->addActions(QList<QAction*>({ui->actionescape_character_to_for_printf_formatting_string,
                                                      ui->actionSplit_output_into_multiple_lines}));
@@ -145,13 +141,10 @@ void MainWindow::onToChanged()
                                                      ui->actionTrimm, ui->actionRemove_duplicates,
                                                      ui->actionSort_numbers, ui->actionCase_sensetive}));
     }
+    else
+        ui->menu_Options->setEnabled(false);
 
     emit ui->textEdit->textChanged();
-}
-
-void MainWindow::onFileReload()
-{
-    openFile(path);
 }
 
 void MainWindow::setupThings()
@@ -187,9 +180,6 @@ void MainWindow::setupThings()
     ui->textEdit->setFocus(Qt::FocusReason::NoFocusReason);
 
     ui->actionOpen->setShortcuts(QKeySequence::Open);
-    ui->actionSave->setShortcuts(QKeySequence::Save);
-    ui->actionSaveAs->setShortcuts(QKeySequence::SaveAs);
-    ui->actionReload->setShortcuts(QKeySequence::Refresh);
     ui->actionPrint->setShortcuts(QKeySequence::Print);
     ui->actionPrintPreview->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_P));
     ui->actionExit->setShortcuts(QKeySequence::Quit);
@@ -200,9 +190,6 @@ void MainWindow::setupThings()
     ui->actionCopy->setShortcuts(QKeySequence::Copy);
     ui->actionPaste->setShortcuts(QKeySequence::Paste);
     ui->actionSelectAll->setShortcuts(QKeySequence::SelectAll);
-
-    if (ui->actionSaveAs->shortcuts().isEmpty())
-        ui->actionSaveAs->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_S));
 
     ui->actionCase_sensetive->setChecked(converter->caseSensetice);
     ui->actionSort_numbers->setChecked(converter->sortNumbers);
@@ -227,22 +214,19 @@ void MainWindow::setupThings()
 
 void MainWindow::loadIcons()
 {
-    loadIcon("application-exit", ui->actionExit);
-    loadIcon("document-open", ui->actionOpen);
-    loadIcon("document-print-preview", ui->actionPrintPreview);
-    loadIcon("document-print", ui->actionPrint);
-    loadIcon("document-save-as", ui->actionSaveAs);
-    loadIcon("document-save", ui->actionSave);
-    loadIcon("edit-copy", ui->actionCopy);
-    loadIcon("edit-cut", ui->actionCut);
-    loadIcon("edit-paste", ui->actionPaste);
-    loadIcon("edit-redo", ui->actionRedo);
-    loadIcon("edit-select-all", ui->actionSelectAll);
-    loadIcon("edit-undo", ui->actionUndo);
-    loadIcon("edit-copy", ui->actionCopy);
-    loadIcon("help-about", ui->actionAbout);
-    loadIcon("text-wrap", ui->actionWord_wrap);
-    loadIcon("document-revert", ui->actionReload);
+    loadIcon(QStringLiteral("application-exit"), ui->actionExit);
+    loadIcon(QStringLiteral("document-open"), ui->actionOpen);
+    loadIcon(QStringLiteral("document-print-preview"), ui->actionPrintPreview);
+    loadIcon(QStringLiteral("document-print"), ui->actionPrint);
+    loadIcon(QStringLiteral("edit-copy"), ui->actionCopy);
+    loadIcon(QStringLiteral("edit-cut"), ui->actionCut);
+    loadIcon(QStringLiteral("edit-paste"), ui->actionPaste);
+    loadIcon(QStringLiteral("edit-redo"), ui->actionRedo);
+    loadIcon(QStringLiteral("edit-select-all"), ui->actionSelectAll);
+    loadIcon(QStringLiteral("edit-undo"), ui->actionUndo);
+    loadIcon(QStringLiteral("edit-copy"), ui->actionCopy);
+    loadIcon(QStringLiteral("help-about"), ui->actionAbout);
+    loadIcon(QStringLiteral("text-wrap"), ui->actionWord_wrap);
 
     ui->menuRecentlyOpened->setIcon(QIcon::fromTheme(QStringLiteral("document-open-recent"),
                                                      QIcon(QStringLiteral(":/icons/document-open-recent.svg"))));
@@ -250,25 +234,24 @@ void MainWindow::loadIcons()
     toolbutton->setIcon(ui->menuRecentlyOpened->icon());
 }
 
-void MainWindow::loadIcon(const char* &&name, QAction* &a)
+void MainWindow::loadIcon(const QString &name, QAction *a)
 {
-    a->setIcon(QIcon::fromTheme(QString::fromUtf8(name), QIcon(QString::fromLatin1(
-                                                ":/icons/%1.svg").arg(QString::fromUtf8(name)))));
+    a->setIcon(QIcon::fromTheme(name, QIcon(QStringLiteral(
+                                                ":/icons/%1.svg").arg(name))));
 }
 
 void MainWindow::changeWordWrap(const bool &c)
 {
-    if (c)
+    if (c) {
         ui->textEdit->setLineWrapMode(QTextEdit::WidgetWidth);
-    else
+        ui->plainTextEdit->setLineWrapMode(QPlainTextEdit::WidgetWidth);
+    }
+    else {
         ui->textEdit->setLineWrapMode(QTextEdit::NoWrap);
+        ui->plainTextEdit->setLineWrapMode(QPlainTextEdit::NoWrap);
+    }
 
     ui->actionWord_wrap->setChecked(c);
-}
-
-void MainWindow::pausePreview(const bool &checked)
-{
-    dontUpdate = checked;
 }
 
 void MainWindow::cut()
@@ -345,42 +328,6 @@ void MainWindow::printPreview(QPrinter *printer)
 #endif
 }
 
-void MainWindow::openInWebBrowser()
-{
-    QTemporaryFile f(this);
-
-    const QString name = f.fileTemplate() + QLatin1String(".html");
-
-    f.setFileTemplate(name);
-    f.setAutoRemove(false);
-
-    if (!f.open()) {
-        qWarning() << "Could not create temporyry file: " << f.errorString();
-
-        QMessageBox::warning(this, tr("Warning"),
-                             tr("Could not create temporary file: %1").arg(
-                                 f.errorString()));
-
-        return;
-    }
-
-    QTextStream out(&f);
-    out << ui->plainTextEdit->toPlainText();
-
-    if (!QDesktopServices::openUrl(QUrl::fromLocalFile(f.fileName())))
-        f.remove();
-    else
-        QTimer::singleShot(2000, this, [name]{
-            QFile::remove(name);
-        });
-}
-
-void MainWindow::changeMode(const int &i)
-{
-    _mode = i;
-    onTextChanged();
-}
-
 void MainWindow::onTextChanged()
 {
     converter->convert(ui->textEdit->toPlainText(),
@@ -399,14 +346,6 @@ void MainWindow::openFile(const QString &newFile)
         updateOpened();
         return;
     }
-    if (f.size() > 50000) {
-        const int out = QMessageBox::warning(this, tr("Large file"),
-                                             tr("This is a large file that can potentially cause performance issues."),
-                                             QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Ok);
-
-        if (out == QMessageBox::Cancel)
-            return;
-    }
 
     QGuiApplication::setOverrideCursor(Qt::WaitCursor);
 
@@ -415,7 +354,6 @@ void MainWindow::openFile(const QString &newFile)
     ui->textEdit->setPlainText(f.readAll());
 
     setWindowFilePath(QFileInfo(newFile).fileName());
-    ui->actionReload->setText(tr("Reload \"%1\"").arg(QFileInfo(newFile).fileName()));
 
     statusBar()->show();
     statusBar()->showMessage(tr("Opened %1").arg(QDir::toNativeSeparators(path)), 10000);
@@ -480,75 +418,6 @@ void MainWindow::onFileOpen()
         openFile(file);   
     }
 #endif
-}
-
-bool MainWindow::onFileSave()
-{
-    if (!ui->textEdit->document()->isModified())
-        if (QFile::exists(path))
-            return true;
-
-    if (path.isEmpty()) {
-        return onFileSaveAs();
-    }
-
-    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
-
-#if defined(Q_OS_WASM)
-    QFileDialog::saveFileContent(ui->plainTextEdit->toPlainText().toUtf8(), path);
-#else
-
-    QSaveFile f(path, this);
-    if (!f.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QGuiApplication::restoreOverrideCursor();
-        QMessageBox::warning(this, tr("Warning"),
-                             tr("Could not write to file %1: %2").arg(
-                                 QDir::toNativeSeparators(path), f.errorString()));
-        return false;
-    }
-
-    QTextStream str(&f);
-    str << ui->textEdit->toPlainText();
-
-    if (!f.commit()) {
-        QGuiApplication::restoreOverrideCursor();
-        QMessageBox::warning(this, tr("Warning"),
-                             tr("Could not write to file %1: %2").arg(
-                                 QDir::toNativeSeparators(path), f.errorString()));
-        return false;
-    }
-#endif
-
-    statusBar()->show();
-    statusBar()->showMessage(tr("Wrote %1").arg(QDir::toNativeSeparators(path)), 30000);
-    QTimer::singleShot(10000, statusBar(), &QStatusBar::hide);
-
-    updateOpened();
-
-    ui->textEdit->document()->setModified(false);
-
-    QGuiApplication::restoreOverrideCursor();
-
-    return true;
-}
-
-bool MainWindow::onFileSaveAs()
-{
-    QFileDialog dialog(this, tr("Save File"));
-    dialog.setMimeTypeFilters({"text/markdown", "text/html", "text/plain"});
-    dialog.setAcceptMode(QFileDialog::AcceptSave);
-    dialog.setDefaultSuffix("md");
-    if (dialog.exec() == QDialog::Rejected)
-        return false;
-
-    const QString file = dialog.selectedFiles().at(0);
-
-    if (file.isEmpty())
-        return false;
-    else
-        path = file;
-
-    return onFileSave();
 }
 
 void MainWindow::onHelpAbout()
@@ -630,7 +499,7 @@ void MainWindow::closeEvent(QCloseEvent *e)
     QMainWindow::closeEvent(e);
 }
 
-void MainWindow::loadSettings(const QString &f) {
+void MainWindow::loadSettings() {
     const QByteArray geo = settings->value(QStringLiteral("geometry"),
                                            QByteArrayLiteral("")).toByteArray();
     if (geo.isEmpty()) {
@@ -654,17 +523,14 @@ void MainWindow::loadSettings(const QString &f) {
 
     const bool lineWrap = settings->value(QStringLiteral("lineWrap"), false).toBool();
     changeWordWrap(lineWrap);
-
-    if (!f.isEmpty())
-        openFile(f);
 }
 
 void MainWindow::saveSettings() {
-    settings->setValue("geometry", saveGeometry());
-    settings->setValue("state", saveState());
-    settings->setValue("recent", recentOpened);
-    settings->setValue("last", path);
-    settings->setValue("lineWrap", ui->actionWord_wrap->isChecked());
+    settings->setValue(QStringLiteral("geometry"), saveGeometry());
+    settings->setValue(QStringLiteral("state"), saveState());
+    settings->setValue(QStringLiteral("recent"), recentOpened);
+    settings->setValue(QStringLiteral("last"), path);
+    settings->setValue(QStringLiteral("lineWrap"), ui->actionWord_wrap->isChecked());
     settings->sync();
 }
 

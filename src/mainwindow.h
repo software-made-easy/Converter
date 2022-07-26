@@ -30,9 +30,6 @@ protected:
 
 private slots:
     void onFileOpen();
-    bool onFileSave();
-    bool onFileSaveAs();
-    void onFileReload();
 
     void setText(const QString &);
 
@@ -43,15 +40,11 @@ private slots:
 
     void onHelpAbout();
     void onTextChanged();
-    void changeMode(const int &);
-
-    void openInWebBrowser();
 
     void filePrint();
     void filePrintPreview();
     void printPreview(QPrinter *);
 
-    void pausePreview(const bool &);
     void changeWordWrap(const bool &);
 
     void cut();
@@ -60,18 +53,17 @@ private slots:
     void selectAll();
 
 private:
-    void loadSettings(const QString &);
+    void loadSettings();
     void saveSettings();
     void updateOpened();
     void openRecent();
 
-    void loadIcon(const char* &&name, QAction* &a);
+    void loadIcon(const QString &name, QAction* a);
     void loadIcons();
 
     Ui::MainWindow *ui;
 
     QString path;
-    int _mode;
 
     From currentFrom;
     To currentTo;
@@ -79,8 +71,6 @@ private:
     QSettings *settings = nullptr;
 
     QStringList recentOpened;
-
-    bool dontUpdate;
 
     QToolButton *toolbutton;
 

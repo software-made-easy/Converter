@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include "common.h"
 
 #include <QApplication>
 #include <QLocale>
@@ -19,17 +18,23 @@ int main(int argc, char *argv[])
     a.setApplicationDisplayName(QStringLiteral("Converter"));
     a.setApplicationVersion(APP_VERSION);
 
+    static const QChar underscore[] = {
+        QLatin1Char('_')
+    };
+
     QTranslator translator, qtTranslator;
 
     // load translation for Qt
     if (qtTranslator.load(QLocale::system(), QStringLiteral("qtbase"),
-                          QStringLiteral("_"), QStringLiteral(
+                          QString::fromRawData(underscore, 1),
+                          QStringLiteral(
                               ":/qtTranslations/")))
         a.installTranslator(&qtTranslator);
 
     // try to load translation for current locale from resource file
     if (translator.load(QLocale::system(), QStringLiteral("Converter"),
-                        QStringLiteral("_"), QStringLiteral(":/translations")))
+                        QString::fromRawData(underscore, 1),
+                        QStringLiteral(":/translations")))
         a.installTranslator(&translator);
 
     QCommandLineParser parser;
@@ -39,7 +44,9 @@ int main(int argc, char *argv[])
         "MainWindow", "Simple program for converting strings"
 
         ));
-    parser.addPositionalArgument("file", QCoreApplication::translate(
+    parser.addPositionalArgument(QCoreApplication::translate("MainWindow",
+                                                             "File"),
+                                 QCoreApplication::translate(
                                              "main", "File to open."));
     parser.process(a);
 

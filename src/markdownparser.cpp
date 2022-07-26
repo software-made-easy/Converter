@@ -27,10 +27,10 @@ QString Parser::toHtml(const QString &in, const int &dia)
     else
         parser_flags |= MD_DIALECT_COMMONMARK;
 
-    const QByteArray array = in.toLocal8Bit();
+    const QByteArray array = in.toUtf8();
     QByteArray out;
 
-    md_html(array.data(), array.size(), &captureHtmlFragment, &out,
+    md_html(array.constData(), array.size(), &captureHtmlFragment, &out,
             parser_flags, MD_HTML_FLAG_DEBUG | MD_HTML_FLAG_SKIP_UTF8_BOM);
 
     return out;

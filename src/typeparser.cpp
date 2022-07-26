@@ -4,7 +4,6 @@
 
 #include <qmimedatabase.h>
 #include <QIcon>
-#include <QDebug>
 
 
 TypeParser::TypeParser(QObject *parent)
@@ -17,8 +16,7 @@ QList<MimeType> TypeParser::mimesForTo(const QList<To> &toList)
     QMimeDatabase base;
 
     for (const To &to : toList) {
-        if (to == To::toInvalid)
-            continue;
+        if (to == To::toInvalid) continue;
         mimes << MimeType(to);
     }
 

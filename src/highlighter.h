@@ -2,7 +2,6 @@
 #define HIGHLITER_H
 
 #include <QSyntaxHighlighter>
-#include "common.h"
 
 
 class Highliter : public QSyntaxHighlighter
@@ -16,8 +15,6 @@ public:
         CodeString,
         CodeBuiltIn
     };
-
-    void setTo(const To &);
 
 protected:
     void highlightBlock(const QString &text) override;

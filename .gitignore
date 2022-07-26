@@ -1,4 +1,5 @@
 3rdparty/*
 android/*
 *.user
-packaging/*
+packaging/*.deb
+packaging/Converter/usr/bin/*

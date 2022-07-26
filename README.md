@@ -33,7 +33,7 @@ Converter, as the name suggests, is a simple and easy program to convert strings
 | **Plain**    		| C-string<br>Sorted<br>MD5<br>SHA256<br>SHA512 	|
 | **Markdown** 	|                 HTML<br>Plain                 	|
 | **HTML**     	|               Markdown<br>Plain               	|
-| **C string** 		|                     Plain                     	|
+| **C-string** 		|                     Plain                     	|
 
 ![Example](docs/images/Example.png)
 

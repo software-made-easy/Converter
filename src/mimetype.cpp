@@ -6,18 +6,18 @@
 #include <QMimeDatabase>
 
 
-MimeType::MimeType(QObject *parent)
+MimeType::MimeType()
 {
 }
 
-MimeType::MimeType(const To &to, QObject *parent)
-    : currTo(to)
+MimeType::MimeType(const To &to)
+    :currTo(to)
 {
 }
 
 const QIcon MimeType::icon()
 {
-    QMimeType currMime = TypeParser::mimeForTo(currTo);
+    const QMimeType currMime = TypeParser::mimeForTo(currTo);
 
     if (currMime.isValid()) {
         return TypeParser::iconForMime(currMime);
@@ -36,7 +36,7 @@ const QIcon MimeType::icon()
 
 const QString MimeType::comment()
 {
-    QMimeType currMime = TypeParser::mimeForTo(currTo);
+    const QMimeType currMime = TypeParser::mimeForTo(currTo);
 
     if (currMime.isValid())
         return currMime.comment();
