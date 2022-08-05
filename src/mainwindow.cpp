@@ -73,13 +73,18 @@ MainWindow::MainWindow(const QString &file, QWidget *parent)
             ui->textEdit, &QTextEdit::undo);
     connect(ui->actionRedo, &QAction::triggered,
             ui->textEdit, &QTextEdit::undo);
-    connect(ui->textEdit, &QTextEdit::textChanged,
+    connect(ui->textEdit->document(), &QTextDocument::contentsChanged,
             this, &MainWindow::onTextChanged);
     connect(converter, &Converter::htmlReady,
             this, &MainWindow::setText);
 
     ui->actionUndo->setEnabled(false);
     ui->actionRedo->setEnabled(false);
+
+#ifdef Q_OS_ANDROID
+    ui->File->setIconSize(QSize(24, 24));
+    ui->toolBarEdit->setIconSize(QSize(24, 24));
+#endif
 
     ui->File->addAction(ui->actionOpen);
     ui->File->addSeparator();
@@ -92,6 +97,7 @@ MainWindow::MainWindow(const QString &file, QWidget *parent)
 
     ui->toolBarEdit->addAction(ui->actionUndo);
     ui->toolBarEdit->addAction(ui->actionRedo);
+    ui->toolBarEdit->addSeparator();
     ui->toolBarEdit->addAction(ui->actionCut);
     ui->toolBarEdit->addAction(ui->actionCopy);
     ui->toolBarEdit->addAction(ui->actionPaste);
@@ -101,16 +107,26 @@ MainWindow::MainWindow(const QString &file, QWidget *parent)
         QMetaObject::invokeMethod(this, [file, this] {
             openFile(file);
         }, Qt::QueuedConnection);
+    else
+        statusBar()->hide();
 }
 
 void MainWindow::setText(const QString &html)
 {
-    ui->plainTextEdit->setPlainText(html);
+    if (currentTo == To::toPreview)
+        ui->plainTextEdit->document()->setHtml(html);
+    else
+        ui->plainTextEdit->document()->setPlainText(html);
 }
 
 void MainWindow::onFromChanged()
 {
     currentFrom = From(ui->from->currentData().toInt());
+
+    if (currentFrom == From::HTML)
+        htmlHighliter->setDocument(ui->textEdit->document());
+    else
+        htmlHighliter->setDocument(nullptr);
 
     QList<MimeType> mimes = TypeParser::mimesForFrom(currentFrom);
     ui->to->clear();
@@ -127,7 +143,7 @@ void MainWindow::onToChanged()
 
     if (currentTo == To::toHTML)
         htmlHighliter->setDocument(ui->plainTextEdit->document());
-    else
+    else if (htmlHighliter->document() == ui->plainTextEdit->document())
         htmlHighliter->setDocument(nullptr);
 
     ui->menu_Options->clear();
@@ -144,12 +160,14 @@ void MainWindow::onToChanged()
     else
         ui->menu_Options->setEnabled(false);
 
-    emit ui->textEdit->textChanged();
+    QCoreApplication::processEvents();
+
+    emit ui->textEdit->document()->contentsChanged();
 }
 
 void MainWindow::setupThings()
 {
-    htmlHighliter = new Highliter(ui->plainTextEdit->document());
+    htmlHighliter = new Highliter(this);
     converter = new Converter(this);
 
     connect(ui->from, qOverload<int>(&QComboBox::currentIndexChanged),
@@ -181,7 +199,7 @@ void MainWindow::setupThings()
 
     ui->actionOpen->setShortcuts(QKeySequence::Open);
     ui->actionPrint->setShortcuts(QKeySequence::Print);
-    ui->actionPrintPreview->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_P));
+    ui->actionPrintPreview->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_O));
     ui->actionExit->setShortcuts(QKeySequence::Quit);
 
     ui->actionUndo->setShortcuts(QKeySequence::Undo);
@@ -240,15 +258,15 @@ void MainWindow::loadIcon(const QString &name, QAction *a)
                                                 ":/icons/%1.svg").arg(name))));
 }
 
-void MainWindow::changeWordWrap(const bool &c)
+void MainWindow::changeWordWrap(const bool c)
 {
     if (c) {
         ui->textEdit->setLineWrapMode(QTextEdit::WidgetWidth);
-        ui->plainTextEdit->setLineWrapMode(QPlainTextEdit::WidgetWidth);
+        ui->plainTextEdit->setLineWrapMode(QTextEdit::WidgetWidth);
     }
     else {
         ui->textEdit->setLineWrapMode(QTextEdit::NoWrap);
-        ui->plainTextEdit->setLineWrapMode(QPlainTextEdit::NoWrap);
+        ui->plainTextEdit->setLineWrapMode(QTextEdit::NoWrap);
     }
 
     ui->actionWord_wrap->setChecked(c);
@@ -330,7 +348,7 @@ void MainWindow::printPreview(QPrinter *printer)
 
 void MainWindow::onTextChanged()
 {
-    converter->convert(ui->textEdit->toPlainText(),
+    converter->convert(ui->textEdit->document()->toPlainText(),
                         currentFrom, currentTo);
 }
 
@@ -347,6 +365,16 @@ void MainWindow::openFile(const QString &newFile)
         return;
     }
 
+    constexpr int limit = 400000; // 400KB
+    if (f.size() > limit) {
+        const int out = QMessageBox::warning(this, tr("Large file"),
+                                             tr("This is a large file that can potentially cause performance issues."),
+                                             QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Ok);
+
+        if (out == QMessageBox::Cancel)
+            return;
+    }
+
     QGuiApplication::setOverrideCursor(Qt::WaitCursor);
 
     path = newFile;
@@ -356,7 +384,7 @@ void MainWindow::openFile(const QString &newFile)
     setWindowFilePath(QFileInfo(newFile).fileName());
 
     statusBar()->show();
-    statusBar()->showMessage(tr("Opened %1").arg(QDir::toNativeSeparators(path)), 10000);
+    statusBar()->showMessage(tr("Opened %1").arg(QDir::toNativeSeparators(path)), -1);
     QTimer::singleShot(10000, statusBar(), &QStatusBar::hide);
 
     updateOpened();
@@ -364,11 +392,11 @@ void MainWindow::openFile(const QString &newFile)
     QMimeType mime = QMimeDatabase().mimeTypeForFile(newFile);
     const QString name = mime.name();
 
-    if (name == QStringLiteral("text/plain"))
+    if (name == QLatin1String("text/plain"))
         ui->from->setCurrentIndex(0);
-    else if (name == QStringLiteral("text/markdown"))
+    else if (name == QLatin1String("text/markdown"))
         ui->from->setCurrentIndex(1);
-    else if (name == QStringLiteral("text/html"))
+    else if (name == QLatin1String("text/html"))
         ui->from->setCurrentIndex(2);
 
     QGuiApplication::restoreOverrideCursor();
@@ -386,15 +414,14 @@ void MainWindow::onFileOpen()
             ui->textEdit->setPlainText(fileContent);
 
             setWindowFilePath(QFileInfo(newFile).fileName());
-            ui->actionReload->setText(tr("Reload \"%1\"").arg(QFileInfo(newFile).fileName()));
 
             statusBar()->show();
-            statusBar()->showMessage(tr("Opened %1").arg(QDir::toNativeSeparators(path)), 10000);
+            statusBar()->showMessage(tr("Opened %1").arg(QDir::toNativeSeparators(path)), -1);
             QTimer::singleShot(10000, statusBar(), &QStatusBar::hide);
 
             updateOpened();
 
-            QMimeType mime = QMimeDatabase().mimeTypeForData(fileContent);
+            QMimeType mime = QMimeDatabase().mimeTypeForFileNameAndData(newFile, fileContent);
             const QString name = mime.name();
 
             if (name == QStringLiteral("text/plain"))
@@ -407,7 +434,7 @@ void MainWindow::onFileOpen()
             QGuiApplication::restoreOverrideCursor();
         }
     };
-    QFileDialog::getOpenFileContent("Markdown (*.md *.markdown *.mkd)", fileContentReady);
+    QFileDialog::getOpenFileContent("Plain (*.txt);; Markdown (*.md *.markdown *.mkd);; HTML (*.html *.htm)", fileContentReady);
 #else
     QFileDialog dialog(this, tr("Open File"));
     dialog.setMimeTypeFilters({"text/markdown", "text/plain", "text/html"});
@@ -521,7 +548,7 @@ void MainWindow::loadSettings() {
         }
     }
 
-    const bool lineWrap = settings->value(QStringLiteral("lineWrap"), false).toBool();
+    const bool lineWrap = settings->value(QStringLiteral("lineWrap"), true).toBool();
     changeWordWrap(lineWrap);
 }
 

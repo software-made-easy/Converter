@@ -33,8 +33,6 @@ QMimeType TypeParser::mimeForTo(const To &to)
         return base.mimeTypeForName(QStringLiteral("text/markdown"));
     else if (to == To::toPlain)
         return base.mimeTypeForName(QStringLiteral("text/plain"));
-    else if (to == To::toPDF)
-        return base.mimeTypeForName(QStringLiteral("application/pdf"));
     else if (to == To::toImage)
         return base.mimeTypeForName(QStringLiteral("image/png"));
     else
@@ -44,9 +42,9 @@ QMimeType TypeParser::mimeForTo(const To &to)
 QList<To> TypeParser::ToForFrom(const From &from)
 {
     if (from == From::HTML)
-        return QList<To>({To::toMarkdown, To::toPlain});
+        return QList<To>({To::toMarkdown, To::toPlain, To::toPreview});
     else if (from == From::Markdown)
-        return QList<To>({To::toHTML, To::toPlain});
+        return QList<To>({To::toHTML, To::toPlain, To::toPreview});
     else if (from == From::Plain)
         return QList<To>({To::toCString, To::toSorted, To::toMD5, To::toSha256,
                          To::toSha512});

@@ -6,6 +6,7 @@
 #include <QCryptographicHash>
 
 #include "common.h"
+using namespace Common;
 
 
 class Converter : public QThread
@@ -25,7 +26,7 @@ public:
     QString plain2Sorted(const QString &);
     QString plain2Hash(const QString &, QCryptographicHash::Algorithm);
 
-    QString c2Plain(QString);
+    QString c2Plain(const QString &);
 
     // Options for To::toCString
     bool multiLine = true;
@@ -40,10 +41,10 @@ public:
     bool caseSensetice = true;
 
 public slots:
-    void convert(const QString &, const From &, const To &);
+    void convert(const QString &, const Common::From &, const Common::To &);
 
 signals:
-    void htmlReady(QString html);
+    void htmlReady(const QString &html);
 
 private:
     void run() override;

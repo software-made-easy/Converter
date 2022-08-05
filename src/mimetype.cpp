@@ -28,6 +28,9 @@ const QIcon MimeType::icon()
     else if (currTo == To::toSorted)
         return QIcon::fromTheme(QStringLiteral("sort-name"),
                                 QIcon(QStringLiteral(":/icons/sort-name.svg")));
+    else if (currTo == To::toPreview)
+        return QIcon::fromTheme(QStringLiteral("view-preview"),
+                                QIcon(QStringLiteral(":/icons/view-preview.svg")));
     else if (currTo == To::toMD5)
         return QIcon(QStringLiteral(":/icons/md5.png"));
     else
@@ -44,6 +47,8 @@ const QString MimeType::comment()
         return QObject::tr("C/C++ string");
     else if (currTo == To::toSorted)
         return QObject::tr("Sorted");
+    else if (currTo == To::toPreview)
+        return QObject::tr("Preview");
     else if (currTo == To::toMD5)
         return QObject::tr("MD5");
     else if (currTo == To::toSha256)

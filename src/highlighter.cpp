@@ -3,8 +3,8 @@
 #include <QTextDocument>
 
 
-Highliter::Highliter(QTextDocument *doc)
-    : QSyntaxHighlighter(doc)
+Highliter::Highliter(QObject *parent)
+    : QSyntaxHighlighter(parent)
 {
     QTextCharFormat format;
 
@@ -37,7 +37,7 @@ void Highliter::highlightBlock(const QString &text)
 
     setFormat(0, textLen, _formats[CodeBlock]);
 
-    for (int i = 0; i < textLen; ++i) {
+    for (int i = 0; i < textLen -1; ++i) {
         if (text[i] == QLatin1Char('<') && text[i+1] != QLatin1Char('!')) {
             const int found = text.indexOf(QLatin1Char('>'), i);
             if (found > 0) {

@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include "common.h"
+using namespace Common;
 
 QT_BEGIN_NAMESPACE
 class QMimeType;

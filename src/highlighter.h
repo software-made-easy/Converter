@@ -7,7 +7,7 @@
 class Highliter : public QSyntaxHighlighter
 {
 public:
-    explicit Highliter(QTextDocument *doc);
+    explicit Highliter(QObject *parent = nullptr);
 
     enum Token {
         CodeBlock,

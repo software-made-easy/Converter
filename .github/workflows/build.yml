@@ -50,14 +50,13 @@ jobs:
       #
       # Clone dependencys
       #
-    - name: Clone MarkdownEdit's dependencys
+    - name: Clone Converter's dependencys
       run: |
         git submodule update --init --recursive -j 4
-
       #
-      # Build MarkdownEdit using CMake
+      # Build Converter using CMake
       #
-    - name: Build MarkdownEdit using CMake
+    - name: Build Converter using CMake
       run: |
         mkdir build-cmake && cd build-cmake
         cmake ..

@@ -1,9 +1,10 @@
 #include "converter.h"
 #include "markdownparser.h"
 
-#include "qdebug.h"
-
 #include <QTextDocument>
+
+
+using namespace Common;
 
 
 bool sortSensitive(const QString &s1, const QString& s2)
@@ -48,6 +49,9 @@ void Converter::convert(const QString &in, const From &from, const To &to)
 #ifdef NO_THREADING
     run();
 #else
+    if (isRunning())
+        quit();
+
     start();
 #endif
 }
@@ -61,6 +65,9 @@ void Converter::run()
         if (_from == From::Markdown) {
             switch (_to) {
             case To::toHTML:
+                out = markdown2HTML(_in);
+                break;
+            case To::toPreview: // extra because else To::toHTML would be brocken
                 out = markdown2HTML(_in);
                 break;
             case To::toPlain:
@@ -77,6 +84,9 @@ void Converter::run()
                 break;
             case To::toPlain:
                 out = html2Plain(_in);
+                break;
+            case To::toPreview:
+                out = _in;
                 break;
             default:
                 break;
@@ -126,26 +136,26 @@ QString Converter::markdown2Plain(const QString &in)
 {
     QTextDocument doc;
     doc.setHtml(markdown2HTML(in));
-    return doc.toPlainText();
+    return doc.toPlainText().trimmed();
 }
 
 QString Converter::html2Markdown(const QString &in)
 {
-    return Parser::toMarkdown(in);
+    return Parser::toMarkdown(in).trimmed();
 }
 
 QString Converter::html2Plain(const QString &in)
 {
     QTextDocument doc;
     doc.setHtml(in);
-    return doc.toPlainText();
+    return doc.toPlainText().trimmed();
 }
 
 QString Converter::plain2C(QString in) {
     QString out;
 
-    in.replace(QChar('\\'), QLatin1String("\\\\"));
-    in.replace(QChar('"'), QLatin1String("\\\""));
+    in.replace(QChar('\\'), QLatin1String("\\\\")); // replace \ with \\
+    in.replace(QChar('"'), QLatin1String("\\\"")); // replace " with \"
 
     if (escapePercent)
         in.replace(QChar('%'), QLatin1String("%%"));
@@ -155,7 +165,7 @@ QString Converter::plain2C(QString in) {
         if (multiLine)
             out.append(QChar('"'));
 
-        out.append(list.at(i));
+        out.append(list[i]);
 
         if (list.length() -1 > i)
             out.append(QLatin1String("\\n"));
@@ -177,6 +187,7 @@ QString Converter::plain2C(QString in) {
 QString Converter::plain2Sorted(const QString &in)
 {
     QStringList list = in.split(QChar('\n'));
+    QStringList out;
 
     if (sort) {
         if (sortNumbers) {
@@ -195,19 +206,20 @@ QString Converter::plain2Sorted(const QString &in)
         list.removeDuplicates();
 
     for (int i = 0; list.length() > i; i++) {
-        const QString &line = list.at(i);
+        QString line = list[i];
+
+        if (trimm)
+            line = line.trimmed();
 
         if (line.isEmpty())
             if (skipEmpty) {
-                list.removeOne(line);
                 continue;
             }
 
-        if (trimm)
-            list.replace(i, line.trimmed());
+        out.append(line);
     }
 
-    return list.join(QChar('\n'));
+    return out.join(QChar('\n'));
 }
 
 QString Converter::plain2Hash(const QString &in, QCryptographicHash::Algorithm alg)
@@ -215,20 +227,13 @@ QString Converter::plain2Hash(const QString &in, QCryptographicHash::Algorithm a
     return QCryptographicHash::hash(in.toUtf8(), alg).toHex();
 }
 
-QString Converter::c2Plain(QString in)
+QString Converter::c2Plain(const QString &in)
 {
     QString out;
 
-    in.replace(QLatin1String("\\\""), QChar('"'));  // Replace \" with "
-    in.replace(QLatin1String("\\n"), QChar('\n')); // Replace \\n with line breaks
-    in.replace(QLatin1String("\\\\"), QChar('\\')); // Replace \\ with \
-
-    if (escapePercent)
-        in.replace(QLatin1String("%%"), QChar('%'));
-
     const QStringList list = in.split(QChar('\n'));
-    for (QString line : list) {
-        line = line.trimmed();
+    for (int i = 0; list.length() > i; i++) {
+        QString line = list[i].trimmed();
 
         if (line.length() > 1) {
             if (line.startsWith(QChar('"')))
@@ -237,8 +242,14 @@ QString Converter::c2Plain(QString in)
                 line.remove(line.length() -1, 1);
         }
 
+        line.replace(QLatin1String("\\\""), QChar('"'));  // Replace \" with "
+        line.replace(QLatin1String("\\n"), QChar('\n')); // Replace \n with line break
+        line.replace(QLatin1String("\\\\"), QChar('\\')); // Replace \\ with \
+
+        if (escapePercent)
+            line.replace(QLatin1String("%%"), QChar('%'));
+
         out.append(line);
-        out.append(QChar('\n'));
     }
 
     return out;

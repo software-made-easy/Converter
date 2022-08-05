@@ -16,23 +16,25 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
     a.setApplicationDisplayName(QStringLiteral("Converter"));
-    a.setApplicationVersion(APP_VERSION);
+    a.setApplicationVersion(QStringLiteral(APP_VERSION));
 
-    static const QChar underscore[] = {
+    static constexpr QChar underscore[] = {
         QLatin1Char('_')
     };
+
+    const QLocale system = QLocale::system();
 
     QTranslator translator, qtTranslator;
 
     // load translation for Qt
-    if (qtTranslator.load(QLocale::system(), QStringLiteral("qtbase"),
+    if (qtTranslator.load(system, QStringLiteral("qtbase"),
                           QString::fromRawData(underscore, 1),
                           QStringLiteral(
                               ":/qtTranslations/")))
         a.installTranslator(&qtTranslator);
 
     // try to load translation for current locale from resource file
-    if (translator.load(QLocale::system(), QStringLiteral("Converter"),
+    if (translator.load(system, QStringLiteral("Converter"),
                         QString::fromRawData(underscore, 1),
                         QStringLiteral(":/translations")))
         a.installTranslator(&translator);

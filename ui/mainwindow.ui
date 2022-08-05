@@ -48,9 +48,15 @@
          <widget class="QComboBox" name="to"/>
         </item>
         <item>
-         <widget class="QPlainTextEdit" name="plainTextEdit">
+         <widget class="QTextEdit" name="plainTextEdit">
+          <property name="undoRedoEnabled">
+           <bool>false</bool>
+          </property>
           <property name="readOnly">
            <bool>true</bool>
+          </property>
+          <property name="textInteractionFlags">
+           <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
           </property>
          </widget>
         </item>

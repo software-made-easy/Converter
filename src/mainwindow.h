@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "common.h"
+using namespace Common;
 
 
 QT_BEGIN_NAMESPACE
@@ -45,7 +46,7 @@ private slots:
     void filePrintPreview();
     void printPreview(QPrinter *);
 
-    void changeWordWrap(const bool &);
+    void changeWordWrap(const bool);
 
     void cut();
     void copy();

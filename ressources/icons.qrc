@@ -19,5 +19,6 @@
         <file>icons/sort-name.svg</file>
         <file>icons/md5.png</file>
         <file>icons/text-plain.png</file>
+        <file>icons/view-preview.svg</file>
     </qresource>
 </RCC>

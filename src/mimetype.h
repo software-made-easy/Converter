@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include <QObject>
+using namespace Common;
 
 QT_BEGIN_NAMESPACE
 class QIcon;

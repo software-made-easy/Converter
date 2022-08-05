@@ -4,7 +4,7 @@ Architecture: amd64
 Priority: optional
 Installed-Size: 1064
 Homepage: https://software-made-easy.github.io/Converter/
-Maintainer: Tim Gromeyer <gromeyer1012@gmail.com>
+Maintainer: Tim Gromeyer <sakul8826@gmail.com>
 Description: Converter is a simple program for converting strings.
 Depends: libqt5core5a, libqt5gui5, libqt5widgets5, libqt5printsupport5
 Suggests: qt5ct

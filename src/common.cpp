@@ -1,7 +1,9 @@
+#include "common.h"
+
 #include <QPalette>
 
 
-bool isDarkMode()
+const bool isDarkMode()
 {
     static const QColor back = QPalette().base().color();
     static int r, g, b, a;

@@ -5,6 +5,18 @@
 
 #define MD_UNDERLINE true
 
+
+///////////////////////////////////////////////////////////////////////////////////
+///
+/// Developer space
+///
+///////////////////////////////////////////////////////////////////////////////////
+
+#include <QObject>
+
+namespace Common
+{
+Q_NAMESPACE
 enum From {
     NotSupportet = -1,
     Markdown = 0,
@@ -15,18 +27,20 @@ enum From {
 
 enum To {
     toInvalid = -1,
-    toPDF = 0,
-    toImage = 1,
-    toHTML = 2,
-    toMarkdown = 3,
-    toPlain = 4,
-    toCString = 5,
-    toSorted = 6,
-    toMD5 = 7,
-    toSha256 = 8,
-    toSha512 = 9
+    toImage = 0,
+    toHTML = 1,
+    toMarkdown = 2,
+    toPlain = 3,
+    toCString = 4,
+    toSorted = 5,
+    toMD5 = 6,
+    toSha256 = 7,
+    toSha512 = 8,
+    toPreview = 9
 };
-
-bool isDarkMode();
+    Q_ENUM_NS(From);
+    Q_ENUM_NS(To);
+};
+const bool isDarkMode();
 
 #endif // COMMON_H
