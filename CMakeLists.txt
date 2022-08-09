@@ -35,8 +35,6 @@ set(PROJECT_SOURCES
         src/main.cpp
         src/mainwindow.cpp
         src/mainwindow.h
-        src/about.cpp
-        src/about.h
         src/common.cpp
         src/mainwindow.cpp
         src/mainwindow.h

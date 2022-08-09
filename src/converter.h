@@ -22,7 +22,7 @@ public:
     QString html2Markdown(const QString &);
     QString html2Plain(const QString &);
 
-    QString plain2C(QString);
+    QString plain2C(const QString &);
     QString plain2Sorted(const QString &);
     QString plain2Hash(const QString &, QCryptographicHash::Algorithm);
 

@@ -151,28 +151,36 @@ QString Converter::html2Plain(const QString &in)
     return doc.toPlainText().trimmed();
 }
 
-QString Converter::plain2C(QString in) {
+QString Converter::plain2C(const QString &in) {
     QString out;
 
-    in.replace(QChar('\\'), QLatin1String("\\\\")); // replace \ with \\
-    in.replace(QChar('"'), QLatin1String("\\\"")); // replace " with \"
-
-    if (escapePercent)
-        in.replace(QChar('%'), QLatin1String("%%"));
-
+    // Split input in each line
     QStringList list = in.split(QChar('\n'));
-    for (int i = 0; list.length() > i; i++) {
+    for (int i = 0; list.length() > i; i++) { // Go throught each line of the input
+        QString line = list[i]; // Thats the line
+
+        line.replace(QChar('\\'), QLatin1String("\\\\")); // replace "\" with "\\"
+        line.replace(QChar('"'), QLatin1String("\\\"")); // replace " with \"
+
+        // For printf()
+        if(escapePercent)
+            line.replace(QChar('%'), QLatin1String("%%"));
+
+        // If option "Split output into multiple lines" is active add a " to the output
         if (multiLine)
             out.append(QChar('"'));
 
-        out.append(list[i]);
+        // append the line to the output
+        out.append(line);
 
+        // append a "\n" to the output because we are at the end of a line
         if (list.length() -1 > i)
             out.append(QLatin1String("\\n"));
 
+        // If option "Split output into multiple lines" is active add a " and \n to the output
         if (multiLine) {
             out.append(QChar('"'));
-            out.append(QChar(QChar::LineSeparator));
+            out.append(QChar('\n'));
         }
     }
 

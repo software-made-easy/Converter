@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "about.h"
 #include "highlighter.h"
 #include "common.h"
 #include "typeparser.h"
@@ -35,11 +34,6 @@ MainWindow::MainWindow(const QString &file, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-    if (isDarkMode())
-        setWindowIcon(QIcon(QStringLiteral(":/Icon_dark.svg")));
-    else
-        setWindowIcon(QIcon(QStringLiteral(":/Icon.svg")));
-
     ui->setupUi(this);
 
     toolbutton = new QToolButton(this);
@@ -116,7 +110,7 @@ void MainWindow::setText(const QString &html)
     if (currentTo == To::toPreview)
         ui->plainTextEdit->document()->setHtml(html);
     else
-        ui->plainTextEdit->document()->setPlainText(html);
+        ui->plainTextEdit->setPlainText(html);
 }
 
 void MainWindow::onFromChanged()
@@ -250,6 +244,8 @@ void MainWindow::loadIcons()
                                                      QIcon(QStringLiteral(":/icons/document-open-recent.svg"))));
 
     toolbutton->setIcon(ui->menuRecentlyOpened->icon());
+
+    setWindowIcon(QIcon(QStringLiteral(":/Logo.png")));
 }
 
 void MainWindow::loadIcon(const QString &name, QAction *a)
@@ -449,14 +445,29 @@ void MainWindow::onFileOpen()
 
 void MainWindow::onHelpAbout()
 {
-    About dialog(this);
-    dialog.setAppUrl(QStringLiteral("https://software-made-easy.github.io/Converter/"));
-    dialog.setDescription(tr("Simple program for converting strings"));
-
-
-    dialog.addCredit(tr("<p>The conversion from Markdown to HTML is done with the help of the <a href=\"https://github.com/mity/md4c\">md4c</a> library by <em>Martin Mitáš</em>.</p>"));
-
-    dialog.exec();
+    QMessageBox::about(this, tr("About Converter"),
+                       tr("<h2>Converter</h2>\n"
+                          "<p dir=\"auto\">Converter, as the name suggests, is a simple program to convert strings.</p>\n"
+                          "<h2>About</h2>\n"
+                          "<table class=\"table\" style=\"border-style: none;\">\n"
+                          "<tbody>\n"
+                          "<tr>\n"
+                          "<td>Version:&nbsp;</td>\n"
+                          "<td>%1</td>\n"
+                          "</tr>\n"
+                          "<tr>\n"
+                          "<td>Qt Version:</td>\n"
+                          "<td>%2</td>\n"
+                          "</tr>\n"
+                          "<tr>\n"
+                          "<td>Homepage:</td>\n"
+                          "<td><a href=\"https://software-made-easy.github.io/Converter/\">https://software-made-easy.github.io/Converter/</a></td>\n"
+                          "</tr>\n"
+                          "</tbody>\n"
+                          "</table>\n"
+                          "<h2>Credits</h2>\n"
+                          "<p>The conversion from Markdown to HTML is done using the <a href=\"https://github.com/mity/md4c\">md4c</a> library by <em>Martin Mit&aacute;&scaron;</em>.</p>"
+                          ).arg(QStringLiteral(APP_VERSION), QString::fromLatin1(qVersion())));
 }
 
 void MainWindow::openRecent() {
