@@ -64,10 +64,8 @@ void Converter::run()
 
         if (_from == From::Markdown) {
             switch (_to) {
+            case To::toPreview:
             case To::toHTML:
-                out = markdown2HTML(_in);
-                break;
-            case To::toPreview: // extra because else To::toHTML would be brocken
                 out = markdown2HTML(_in);
                 break;
             case To::toPlain:

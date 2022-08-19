@@ -1,7 +1,6 @@
 #ifndef TYPEPARSER_H
 #define TYPEPARSER_H
 
-#include <QObject>
 #include "common.h"
 using namespace Common;
 
@@ -9,17 +8,14 @@ QT_BEGIN_NAMESPACE
 class QMimeType;
 class QIcon;
 class MimeType;
+template <typename T> class QList;
 QT_END_NAMESPACE
 
 
 class TypeParser
 {
 public:
-    TypeParser(QObject *parent = nullptr);
-
-    static From enumForFile(const QString &);
-    static From enumForData(const QString &);
-    static From enumForMime(const QMimeType &);
+    TypeParser();
 
     static const QIcon iconForMime(const QMimeType &);
 

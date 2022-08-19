@@ -13,6 +13,7 @@ class QSettings;
 class QToolButton;
 class Highliter;
 class Converter;
+class QMimeType;
 QT_END_NAMESPACE
 
 
@@ -53,6 +54,10 @@ private slots:
     void paste();
     void selectAll();
 
+    // Mime detection
+    void onDetectFile();
+    void detectFile(const QString &, const QByteArray &);
+
 private:
     void loadSettings();
     void saveSettings();
@@ -62,6 +67,8 @@ private:
     void loadIcon(const QString &name, QAction* a);
     void loadIcons();
 
+    QString formatMimeTypeInfo(const QMimeType &);
+
     Ui::MainWindow *ui;
 
     QString path;
@@ -69,7 +76,7 @@ private:
     From currentFrom;
     To currentTo;
 
-    QSettings *settings = nullptr;
+    QSettings *settings;
 
     QStringList recentOpened;
 

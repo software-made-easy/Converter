@@ -116,6 +116,7 @@
      <string>E&amp;xtras</string>
     </property>
     <addaction name="actionWord_wrap"/>
+    <addaction name="actionDetect_mime_type"/>
    </widget>
    <widget class="QMenu" name="menu_Help">
     <property name="title">
@@ -338,6 +339,11 @@
    </property>
    <property name="toolTip">
     <string>Case sensetive</string>
+   </property>
+  </action>
+  <action name="actionDetect_mime_type">
+   <property name="text">
+    <string>Detect mime type</string>
    </property>
   </action>
  </widget>

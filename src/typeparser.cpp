@@ -1,12 +1,11 @@
 #include "typeparser.h"
-#include "common.h"
 #include "mimetype.h"
 
 #include <qmimedatabase.h>
 #include <QIcon>
 
 
-TypeParser::TypeParser(QObject *parent)
+TypeParser::TypeParser()
 {
 }
 
@@ -57,34 +56,6 @@ QList<To> TypeParser::ToForFrom(const From &from)
 QList<MimeType> TypeParser::mimesForFrom(const From &from)
 {
     return mimesForTo(ToForFrom(from));
-}
-
-From TypeParser::enumForFile(const QString &file)
-{
-    const QMimeType mime = QMimeDatabase().mimeTypeForFile(file);
-
-    return enumForMime(mime);
-}
-
-From TypeParser::enumForData(const QString &data)
-{
-    const QMimeType mime = QMimeDatabase().mimeTypeForData(data.toUtf8());
-
-    return enumForMime(mime);
-}
-
-From TypeParser::enumForMime(const QMimeType &mime)
-{
-    const QString name = mime.name();
-
-    if (name == QStringLiteral("text/markdown"))
-        return From::Markdown;
-    else if (name == QStringLiteral("text/html"))
-        return From::HTML;
-    else if (name == QStringLiteral("text/plain"))
-        return From::Plain;
-    else
-        return From::NotSupportet;
 }
 
 const QIcon TypeParser::iconForMime(const QMimeType &mime)

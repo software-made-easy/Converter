@@ -13,8 +13,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Svg is nessesary for android
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools PrintSupport Svg)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools PrintSupport Svg)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools PrintSupport)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools PrintSupport)
 
 
 if (EMSCRIPTEN)
@@ -30,6 +30,17 @@ set(RC_FILES
 
 include(3rdparty/CMakeLists.txt)
 include(cmake/TranslationUtils.cmake)
+
+# svg required for android
+if (ANDROID)
+    find_package(Qt${QT_VERSION_MAJOR} QUIET COMPONENTS Svg)
+    if (Qt${QT_VERSION_MAJOR}Svg_FOUND)
+        message(STATUS "Include Qt Svg library")
+        list(APPEND 3rdparty
+            Qt${QT_VERSION_MAJOR}::Svg
+        )
+    endif()
+endif(ANDROID)
 
 set(PROJECT_SOURCES
         src/main.cpp
@@ -91,9 +102,9 @@ IF(WIN32)
 ENDIF(WIN32)
 
 target_include_directories(converter PRIVATE ${CMAKE_SOURCE_DIR}/src)
-target_link_libraries(converter PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::PrintSupport Qt${QT_VERSION_MAJOR}::Svg ${INTL_LDFLAGS} ${3rdparty})
+target_link_libraries(converter PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::PrintSupport ${INTL_LDFLAGS} ${3rdparty})
 
-target_compile_definitions(converter PUBLIC APP_VERSION="${PROJECT_VERSION}" QT_DISABLE_DEPRECATED_BEFORE=0x051208)
+target_compile_definitions(converter PUBLIC APP_VERSION="${PROJECT_VERSION}" QT_DISABLE_DEPRECATED_BEFORE=0x051208 QT_NO_REGEXP)
 
 set_target_properties(converter PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER org.qtproject.converter

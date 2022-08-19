@@ -29,6 +29,12 @@
 #include <QtPrintSupport/QPrintPreviewDialog>
 #endif
 
+QTextStream &operator<<(QTextStream &stream, const QStringList &list)
+{
+    stream << list.join(QLatin1String(", "));
+    return stream;
+}
+
 
 MainWindow::MainWindow(const QString &file, QWidget *parent)
     : QMainWindow(parent)
@@ -71,6 +77,8 @@ MainWindow::MainWindow(const QString &file, QWidget *parent)
             this, &MainWindow::onTextChanged);
     connect(converter, &Converter::htmlReady,
             this, &MainWindow::setText);
+    connect(ui->actionDetect_mime_type, &QAction::triggered,
+            this, &MainWindow::onDetectFile);
 
     ui->actionUndo->setEnabled(false);
     ui->actionRedo->setEnabled(false);
@@ -172,9 +180,9 @@ void MainWindow::setupThings()
     QMimeDatabase base;
     TypeParser parser;
 
-    QMimeType markdown = base.mimeTypeForName(QStringLiteral("text/markdown"));
-    QMimeType html = base.mimeTypeForName(QStringLiteral("text/html"));
-    QMimeType plain = base.mimeTypeForName(QStringLiteral("text/plain"));
+    const QMimeType markdown = base.mimeTypeForName(QStringLiteral("text/markdown"));
+    const QMimeType html = base.mimeTypeForName(QStringLiteral("text/html"));
+    const QMimeType plain = base.mimeTypeForName(QStringLiteral("text/plain"));
 
     MimeType c(To::toCString);
 
@@ -363,7 +371,7 @@ void MainWindow::openFile(const QString &newFile)
 
     constexpr int limit = 400000; // 400KB
     if (f.size() > limit) {
-        const int out = QMessageBox::warning(this, tr("Large file"),
+        const auto out = QMessageBox::warning(this, tr("Large file"),
                                              tr("This is a large file that can potentially cause performance issues."),
                                              QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Ok);
 
@@ -380,7 +388,7 @@ void MainWindow::openFile(const QString &newFile)
     setWindowFilePath(QFileInfo(newFile).fileName());
 
     statusBar()->show();
-    statusBar()->showMessage(tr("Opened %1").arg(QDir::toNativeSeparators(path)), -1);
+    statusBar()->showMessage(tr("Opened %1").arg(QDir::toNativeSeparators(newFile)), 0);
     QTimer::singleShot(10000, statusBar(), &QStatusBar::hide);
 
     updateOpened();
@@ -402,44 +410,44 @@ void MainWindow::onFileOpen()
 {
 #if defined(Q_OS_WASM)
     auto fileContentReady = [this](const QString &newFile, const QByteArray &fileContent) {
-        if (!newFile.isEmpty()) {
-            QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+        if (newFile.isEmpty()) return;
 
-            path = newFile;
+        QGuiApplication::setOverrideCursor(Qt::WaitCursor);
 
-            ui->textEdit->setPlainText(fileContent);
+        path = newFile;
 
-            setWindowFilePath(QFileInfo(newFile).fileName());
+        ui->textEdit->setPlainText(fileContent);
 
-            statusBar()->show();
-            statusBar()->showMessage(tr("Opened %1").arg(QDir::toNativeSeparators(path)), -1);
-            QTimer::singleShot(10000, statusBar(), &QStatusBar::hide);
+        setWindowFilePath(QFileInfo(newFile).fileName());
 
-            updateOpened();
+        statusBar()->show();
+        statusBar()->showMessage(tr("Opened %1").arg(QDir::toNativeSeparators(newFile)), 0);
+        QTimer::singleShot(10000, statusBar(), &QStatusBar::hide);
 
-            QMimeType mime = QMimeDatabase().mimeTypeForFileNameAndData(newFile, fileContent);
-            const QString name = mime.name();
+        updateOpened();
 
-            if (name == QStringLiteral("text/plain"))
-                ui->from->setCurrentIndex(0);
-            else if (name == QStringLiteral("text/markdown"))
-                ui->from->setCurrentIndex(1);
-            else if (name == QStringLiteral("text/html"))
-                ui->from->setCurrentIndex(2);
+        QMimeType mime = QMimeDatabase().mimeTypeForFileNameAndData(newFile, fileContent);
+        const QString name = mime.name();
 
-            QGuiApplication::restoreOverrideCursor();
-        }
+        if (name == QLatin1String("text/plain"))
+            ui->from->setCurrentIndex(0);
+        else if (name == QLatin1String("text/markdown"))
+            ui->from->setCurrentIndex(1);
+        else if (name == QLatin1String("text/html"))
+            ui->from->setCurrentIndex(2);
+
+        QGuiApplication::restoreOverrideCursor();
     };
     QFileDialog::getOpenFileContent("Plain (*.txt);; Markdown (*.md *.markdown *.mkd);; HTML (*.html *.htm)", fileContentReady);
 #else
     QFileDialog dialog(this, tr("Open File"));
     dialog.setMimeTypeFilters({"text/markdown", "text/plain", "text/html"});
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
-    if (dialog.exec() == QDialog::Accepted) {
-        const QString file = dialog.selectedFiles().at(0);
-        if (file == path || file.isEmpty()) return;
-        openFile(file);   
-    }
+    if (dialog.exec() == QDialog::Rejected) return;
+
+    const QString file = dialog.selectedFiles().at(0);
+    if (file == path || file.isEmpty()) return;
+    openFile(file);
 #endif
 }
 
@@ -519,6 +527,97 @@ void MainWindow::updateOpened() {
     }
 }
 
+// Mime detection
+void MainWindow::onDetectFile()
+{
+#ifdef Q_OS_WASM
+    auto fileContentReady = [this](const QString &newFile, const QByteArray &fileContent) {
+        if (!newFile.isEmpty()) {
+            detectFile(newFile, fileContent);
+        }
+    };
+    QFileDialog::getOpenFileContent(tr("Files (*.*)"), fileContentReady);
+#else
+    QFileDialog dialog(this, tr("Open file"));
+    dialog.setAcceptMode(QFileDialog::AcceptOpen);
+    if (dialog.exec() == QDialog::Accepted) {
+        const QString fileName = dialog.selectedFiles().at(0);
+        if (fileName.isEmpty())
+            return;
+
+        QFile f(fileName);
+        f.open(QIODevice::ReadOnly);
+
+        detectFile(fileName, f.readAll());
+    }
+#endif
+}
+
+void MainWindow::detectFile(const QString &fileName, const QByteArray &fileContents)
+{
+    if (fileName.isEmpty())
+        return onDetectFile();
+
+    QMimeDatabase mimeDatabase;
+    const QFileInfo fi(fileName);
+    const QMimeType mimeType = mimeDatabase.mimeTypeForFileNameAndData(fileName, fileContents);
+    if (!mimeType.isValid()) {
+        QMessageBox::warning(this, tr("Unknown File Type"),
+                                 tr("The type of %1 could not be determined.")
+                                 .arg(QDir::toNativeSeparators(fileName)));
+        return;
+    }
+
+    QMessageBox box(this);
+    box.setText(tr("<em>%1</em> is of type \"%2\"").arg(fi.fileName(), mimeType.name()));
+    box.setInformativeText(formatMimeTypeInfo(mimeType));
+    box.setIcon(QMessageBox::NoIcon);
+
+    box.exec();
+}
+
+QString MainWindow::formatMimeTypeInfo(const QMimeType &t)
+{
+    QString result;
+    QTextStream str(&result);
+    str << "<html><head/><body><h3><center>" << t.name() << "</center></h3><br><table>";
+
+    const QStringList &aliases = t.aliases();
+    if (!aliases.isEmpty())
+        str << tr("<tr><td>Aliases:</td><td>") << aliases;
+
+    str << "</td></tr>"
+        << tr("<tr><td>Comment:</td><td>") << t.comment() << "</td></tr>"
+        << tr("<tr><td>Icon name:</td><td>") << t.iconName() << "</td></tr>"
+        << tr("<tr><td>Generic icon name:</td><td>") << t.genericIconName() << "</td></tr>";
+
+    const QString &filter = t.filterString();
+    if (!filter.isEmpty())
+        str << tr("<tr><td>Filter:</td><td>") << t.filterString() << "</td></tr>";
+
+    const QStringList &patterns = t.globPatterns();
+    if (!patterns.isEmpty())
+        str << tr("<tr><td>Glob patterns:</td><td>") << patterns << "</td></tr>";
+
+    const QStringList &parentMimeTypes = t.parentMimeTypes();
+    if (!parentMimeTypes.isEmpty())
+        str << tr("<tr><td>Parent types:</td><td>") << t.parentMimeTypes() << "</td></tr>";
+
+    QStringList suffixes = t.suffixes();
+    if (!suffixes.isEmpty()) {
+        str << tr("<tr><td>Suffixes:</td><td>");
+        const QString &preferredSuffix = t.preferredSuffix();
+        if (!preferredSuffix.isEmpty()) {
+            suffixes.removeOne(preferredSuffix);
+            str << "<b>" << preferredSuffix << "</b> ";
+        }
+        str << suffixes << "</td></tr>";
+    }
+    str << "</table></body></html>";
+    return result;
+}
+
+
 void MainWindow::closeEvent(QCloseEvent *e)
 {
     if (ui->textEdit->document()->isModified() && path.isEmpty() &&
@@ -567,7 +666,6 @@ void MainWindow::saveSettings() {
     settings->setValue(QStringLiteral("geometry"), saveGeometry());
     settings->setValue(QStringLiteral("state"), saveState());
     settings->setValue(QStringLiteral("recent"), recentOpened);
-    settings->setValue(QStringLiteral("last"), path);
     settings->setValue(QStringLiteral("lineWrap"), ui->actionWord_wrap->isChecked());
     settings->sync();
 }

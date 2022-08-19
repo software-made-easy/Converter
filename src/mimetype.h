@@ -2,19 +2,18 @@
 #define MIMETYPE_H
 
 #include "common.h"
-#include <QObject>
 using namespace Common;
 
 QT_BEGIN_NAMESPACE
 class QIcon;
+class QString;
 QT_END_NAMESPACE
 
 
 class MimeType
 {
 public:
-    MimeType();
-    explicit MimeType(const To &);
+    explicit MimeType(const To);
     ~MimeType() {};
 
     const QIcon icon();
