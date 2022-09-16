@@ -17,12 +17,12 @@ class TypeParser
 public:
     TypeParser();
 
-    static const QIcon iconForMime(const QMimeType &);
+    static auto iconForMime(const QMimeType &) -> const QIcon;
 
-    static QList<MimeType> mimesForTo(const QList<To> &);
-    static QMimeType mimeForTo(const To &);
-    static QList<MimeType> mimesForFrom(const From &);
-    static QList<To> ToForFrom(const From &);
+    static auto mimesForTo(const QList<To> &) -> QList<MimeType>;
+    static auto mimeForTo(Common::To) -> QMimeType;
+    static auto mimesForFrom(const From) -> QList<MimeType>;
+    static auto ToForFrom(Common::From) -> QList<To>;
 };
 
 #endif // TYPEPARSER_H

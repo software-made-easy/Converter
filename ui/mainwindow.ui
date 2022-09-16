@@ -346,6 +346,17 @@
     <string>Detect mime type</string>
    </property>
   </action>
+  <action name="actionUse_GitHub_s_dialect">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Use GitHub's dialect</string>
+   </property>
+   <property name="toolTip">
+    <string>Use GitHub's dialect</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

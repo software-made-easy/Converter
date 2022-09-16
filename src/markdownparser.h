@@ -11,9 +11,9 @@ public:
         GitHub = 1
     };
 
-    Q_REQUIRED_RESULT static QString toHtml(const QString &in, const int &dia = GitHub);
+    Q_REQUIRED_RESULT static auto toHtml(const QString &in, const int dia = GitHub) -> QString;
 
-    Q_REQUIRED_RESULT static QString toMarkdown(QString in);
+    Q_REQUIRED_RESULT static auto toMarkdown(QString in) -> QString;
 };
 
 #endif // MARKDOWNPARSER_H

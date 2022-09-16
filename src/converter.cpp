@@ -7,7 +7,7 @@
 using namespace Common;
 
 
-bool sortSensitive(const QString &s1, const QString& s2)
+auto sortSensitive(const QString &s1, const QString& s2) -> bool
 {
     bool ok = false;
     bool ok2 = false;
@@ -21,7 +21,7 @@ bool sortSensitive(const QString &s1, const QString& s2)
     return std::lexicographical_compare(s1.begin(), s1.end(), s2.begin(), s2.end());
 }
 
-bool sortInsensitive(const QString &s1, const QString& s2)
+auto sortInsensitive(const QString &s1, const QString& s2) -> bool
 {
     bool ok = false;
     bool ok2 = false;
@@ -32,28 +32,12 @@ bool sortInsensitive(const QString &s1, const QString& s2)
     if (ok && ok2)
         return i < i2;
 
-    return s1.compare(s2, Qt::CaseSensitivity::CaseInsensitive) < 0;
+    return s1.compare(s2, Qt::CaseInsensitive) < 0;
 }
 
 Converter::Converter(QObject *parent)
     : QThread{parent}
 {
-}
-
-void Converter::convert(const QString &in, const From &from, const To &to)
-{
-    _in = in;
-    _from = from;
-    _to = to;
-
-#ifdef NO_THREADING
-    run();
-#else
-    if (isRunning())
-        quit();
-
-    start();
-#endif
 }
 
 void Converter::run()
@@ -66,7 +50,7 @@ void Converter::run()
             switch (_to) {
             case To::toPreview:
             case To::toHTML:
-                out = markdown2HTML(_in);
+                out = markdown2HTML(_in, github);
                 break;
             case To::toPlain:
                 out = markdown2Plain(_in);
@@ -95,6 +79,9 @@ void Converter::run()
             case To::toCString:
                 out = plain2C(_in);
                 break;
+            case To::toHTMLEscaped:
+                out = _in.toHtmlEscaped();
+                break;
             case To::toSorted:
                 out = plain2Sorted(_in);
                 break;
@@ -121,99 +108,83 @@ void Converter::run()
             }
         }
 
-        emit htmlReady(out);
+        Q_EMIT htmlReady(out);
     }
 }
 
-QString Converter::markdown2HTML(const QString &in)
+auto Converter::markdown2HTML(const QString &in, const bool git) -> QString
 {
-    return Parser::toHtml(in);
+    return Parser::toHtml(in, git ? Parser::GitHub
+                                  : Parser::Commonmark);
 }
 
-QString Converter::markdown2Plain(const QString &in)
+auto Converter::markdown2Plain(const QString &in) -> QString
 {
-    QTextDocument doc;
-    doc.setHtml(markdown2HTML(in));
+    static QTextDocument doc;
+    doc.setHtml(markdown2HTML(in, false));
     return doc.toPlainText().trimmed();
 }
 
-QString Converter::html2Markdown(const QString &in)
+auto Converter::html2Markdown(const QString &in) -> QString
 {
     return Parser::toMarkdown(in).trimmed();
 }
 
-QString Converter::html2Plain(const QString &in)
+auto Converter::html2Plain(const QString &in) -> QString
 {
-    QTextDocument doc;
+    static QTextDocument doc;
     doc.setHtml(in);
     return doc.toPlainText().trimmed();
 }
 
-QString Converter::plain2C(const QString &in) {
+auto Converter::plain2C(const QString &in) const -> QString
+{
     QString out;
 
     // Split input in each line
-    QStringList list = in.split(QChar('\n'));
-    for (int i = 0; list.length() > i; i++) { // Go throught each line of the input
-        QString line = list[i]; // Thats the line
+    QStringList list = in.split(u'\n');
+    for (int i = 0; list.length() > i; ++i) { // Go through each line of input
+        QString line = list[i]; // That's the line
 
-        line.replace(QChar('\\'), QLatin1String("\\\\")); // replace "\" with "\\"
-        line.replace(QChar('"'), QLatin1String("\\\"")); // replace " with \"
+        line.replace(QChar(u'\\'), L1("\\\\")); // replace "\" with "\\"
+        line.replace(QChar(u'"'), L1("\\\"")); // replace " with \"
 
         // For printf()
         if(escapePercent)
-            line.replace(QChar('%'), QLatin1String("%%"));
+            line.replace(QChar(u'%'), L1("%%"));
 
         // If option "Split output into multiple lines" is active add a " to the output
         if (multiLine)
-            out.append(QChar('"'));
+            out + QChar(u'"');
 
         // append the line to the output
-        out.append(line);
+        out + line;
 
         // append a "\n" to the output because we are at the end of a line
         if (list.length() -1 > i)
-            out.append(QLatin1String("\\n"));
+            out + L1("\\n");
 
         // If option "Split output into multiple lines" is active add a " and \n to the output
         if (multiLine) {
-            out.append(QChar('"'));
-            out.append(QChar('\n'));
+            out + QChar(u'"');
+            out + QChar(u'\n');
         }
     }
 
     if (!multiLine) {
-        out.prepend(QChar('"'));
-        out.append(QChar('"'));
+        out.prepend(QChar(u'"'));
+        out+ QChar(u'"');
     }
 
     return out;
 }
 
-QString Converter::plain2Sorted(const QString &in)
+auto Converter::plain2Sorted(const QString &in) const -> QString
 {
-    QStringList list = in.split(QChar('\n'));
+    QStringList list = in.split(QChar(u'\n'));
     QStringList out;
 
-    if (sort) {
-        if (sortNumbers) {
-            if (caseSensetice)
-                std::sort(list.begin(), list.end(), sortSensitive);
-            else
-                std::sort(list.begin(), list.end(), sortInsensitive);
-        }
-        else if (caseSensetice)
-            list.sort();
-        else
-            list.sort(Qt::CaseInsensitive);
-    }
-
-    if (removeDuplicates)
-        list.removeDuplicates();
-
-    for (int i = 0; list.length() > i; i++) {
-        QString line = list[i];
-
+    for (QString line : list) {
         if (trimm)
             line = line.trimmed();
 
@@ -225,37 +196,53 @@ QString Converter::plain2Sorted(const QString &in)
         out.append(line);
     }
 
-    return out.join(QChar('\n'));
+    if (sort) {
+        if (sortNumbers) {
+            if (caseSensetice)
+                std::sort(out.begin(), out.end(), sortSensitive);
+            else
+                std::sort(out.begin(), out.end(), sortInsensitive);
+        }
+        else if (caseSensetice)
+            out.sort();
+        else
+            out.sort(Qt::CaseInsensitive);
+    }
+
+    if (removeDuplicates)
+        list.removeDuplicates();
+
+    return out.join(u'\n');
 }
 
-QString Converter::plain2Hash(const QString &in, QCryptographicHash::Algorithm alg)
+auto Converter::plain2Hash(const QString &in, QCryptographicHash::Algorithm alg) -> QString
 {
-    return QCryptographicHash::hash(in.toUtf8(), alg).toHex();
+    return QString::fromUtf8(QCryptographicHash::hash(in.toUtf8(), alg).toHex());
 }
 
-QString Converter::c2Plain(const QString &in)
+auto Converter::c2Plain(const QString &in) const -> QString
 {
     QString out;
 
-    const QStringList list = in.split(QChar('\n'));
-    for (int i = 0; list.length() > i; i++) {
-        QString line = list[i].trimmed();
+    const QStringList list = in.split(u'\n');
+    for (QString line : list) {
+        line = line.trimmed();
 
         if (line.length() > 1) {
-            if (line.startsWith(QChar('"')))
+            if (line.startsWith(u'"'))
                 line.remove(0, 1);
-            if (line.endsWith(QChar('"')))
+            if (line.endsWith(u'"'))
                 line.remove(line.length() -1, 1);
         }
 
-        line.replace(QLatin1String("\\\""), QChar('"'));  // Replace \" with "
-        line.replace(QLatin1String("\\n"), QChar('\n')); // Replace \n with line break
-        line.replace(QLatin1String("\\\\"), QChar('\\')); // Replace \\ with \
+        line.replace(L1("\\\""), L1("\""));  // Replace \" with "
+        line.replace(L1("\\n"), L1("\n")); // Replace \n with line break
+        line.replace(L1("\\\\"), L1("\\")); // Replace \\ with \
 
         if (escapePercent)
-            line.replace(QLatin1String("%%"), QChar('%'));
+            line.replace(L1("%%"), L1("%"));
 
-        out.append(line);
+        out + line;
     }
 
     return out;

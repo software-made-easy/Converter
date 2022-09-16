@@ -1,64 +1,88 @@
 #include "typeparser.h"
 #include "mimetype.h"
 
-#include <qmimedatabase.h>
 #include <QIcon>
+#include <QMimeDatabase>
 
 
-TypeParser::TypeParser()
+TypeParser::TypeParser() = default;
+
+auto TypeParser::mimesForTo(const QList<To> &toList) -> QList<MimeType>
 {
-}
+    static constexpr MimeType c(To::toCString);
+    static constexpr MimeType sorted(To::toSorted);
+    static constexpr MimeType preview(To::toPreview);
+    static constexpr MimeType md5(To::toMD5);
+    static constexpr MimeType htmlEscaped(To::toHTMLEscaped);
 
-QList<MimeType> TypeParser::mimesForTo(const QList<To> &toList)
-{
     QList<MimeType> mimes;
-    QMimeDatabase base;
 
     for (const To &to : toList) {
-        if (to == To::toInvalid) continue;
-        mimes << MimeType(to);
+        switch (to) {
+        case To::toCString:
+            mimes.append(c);
+            break;
+        case To::toSorted:
+            mimes.append(sorted);
+            break;
+        case To::toPreview:
+            mimes.append(preview);
+            break;
+        case To::toMD5:
+            mimes.append(md5);
+            break;
+        case To::toHTMLEscaped:
+            mimes.append(htmlEscaped);
+            break;
+        default:
+            if (to != To::toInvalid)
+                mimes.append(MimeType(to));
+        }
     }
 
     return mimes;
 }
 
-QMimeType TypeParser::mimeForTo(const To &to)
+auto TypeParser::mimeForTo(Common::To to) -> QMimeType
 {
-    QMimeDatabase base;
+    static QMimeDatabase base;
 
-    if (to == To::toHTML)
+    switch (to) {
+    case To::toHTML:
         return base.mimeTypeForName(QStringLiteral("text/html"));
-    else if (to == To::toMarkdown)
+    case To::toMarkdown:
         return base.mimeTypeForName(QStringLiteral("text/markdown"));
-    else if (to == To::toPlain)
+    case To::toPlain:
         return base.mimeTypeForName(QStringLiteral("text/plain"));
-    else if (to == To::toImage)
+    case To::toImage:
         return base.mimeTypeForName(QStringLiteral("image/png"));
-    else
-        return QMimeType();
+    default:
+        return {};
+    }
 }
 
-QList<To> TypeParser::ToForFrom(const From &from)
+auto TypeParser::ToForFrom(Common::From from) -> QList<To>
 {
-    if (from == From::HTML)
-        return QList<To>({To::toMarkdown, To::toPlain, To::toPreview});
-    else if (from == From::Markdown)
-        return QList<To>({To::toHTML, To::toPlain, To::toPreview});
-    else if (from == From::Plain)
-        return QList<To>({To::toCString, To::toSorted, To::toMD5, To::toSha256,
-                         To::toSha512});
-    else if (from == From::CString)
-        return QList<To>({To::toPlain});
-    else
-        return QList<To>();
+    switch (from) {
+    case From::HTML:
+        return {To::toMarkdown, To::toPlain, To::toPreview};
+    case From::Markdown:
+        return {To::toHTML, To::toPlain, To::toPreview};
+    case From::Plain:
+        return {To::toCString, To::toHTMLEscaped, To::toSorted, To::toMD5, To::toSha256, To::toSha512};
+    case From::CString:
+        return {To::toPlain};
+    default:
+        return {};
+    }
 }
 
-QList<MimeType> TypeParser::mimesForFrom(const From &from)
+auto TypeParser::mimesForFrom(const From from) -> QList<MimeType>
 {
     return mimesForTo(ToForFrom(from));
 }
 
-const QIcon TypeParser::iconForMime(const QMimeType &mime)
+auto TypeParser::iconForMime(const QMimeType &mime) -> const QIcon
 {
     const QString iconName = mime.iconName();
 

@@ -1,9 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+
 #include <QMainWindow>
-#include "common.h"
-using namespace Common;
 
 
 QT_BEGIN_NAMESPACE
@@ -30,8 +29,12 @@ public:
 protected:
     void closeEvent(QCloseEvent *e) override;
 
-private slots:
+private Q_SLOTS:
     void onFileOpen();
+
+    void loadFile(const QString &);
+
+    void loadIcons();
 
     void setText(const QString &);
 
@@ -64,17 +67,13 @@ private:
     void updateOpened();
     void openRecent();
 
-    void loadIcon(const QString &name, QAction* a);
-    void loadIcons();
+    static void loadIcon(const QString &name, QAction* a);
 
-    QString formatMimeTypeInfo(const QMimeType &);
+    static auto formatMimeTypeInfo(const QMimeType &) -> QString;
 
     Ui::MainWindow *ui;
 
     QString path;
-
-    From currentFrom;
-    To currentTo;
 
     QSettings *settings;
 

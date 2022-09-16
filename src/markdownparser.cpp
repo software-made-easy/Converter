@@ -1,26 +1,26 @@
 #include <QByteArray>
 #include <QRegularExpression>
 
+#include "common.h"
 #include "markdownparser.h"
 #include "md4c-html.h"
-#include "common.h"
 
 
 /* Global options. */
 #if MD_UNDERLINE
-static unsigned parser_flags = MD_FLAG_UNDERLINE;
+static int parser_flags = MD_FLAG_UNDERLINE;
 #else
-static unsigned parser_flags = 0;
+static int parser_flags = 0;
 #endif
 
 
 void captureHtmlFragment (const MD_CHAR* data, MD_SIZE data_size, void* userData) {
-    QByteArray *array = static_cast<QByteArray*>(userData);
+    auto *array = static_cast<QByteArray*>(userData);
 
     array->append(data, data_size);
 }
 
-QString Parser::toHtml(const QString &in, const int &dia)
+auto Parser::toHtml(const QString &in, const int dia) -> QString
 {
     if (dia == GitHub)
         parser_flags |= MD_DIALECT_GITHUB;
@@ -31,15 +31,15 @@ QString Parser::toHtml(const QString &in, const int &dia)
     QByteArray out;
 
     md_html(array.constData(), array.size(), &captureHtmlFragment, &out,
-            parser_flags, MD_HTML_FLAG_DEBUG | MD_HTML_FLAG_SKIP_UTF8_BOM);
+            parser_flags, MD_HTML_FLAG_SKIP_UTF8_BOM);
 
-    return out;
+    return QString::fromUtf8(out);
 }
 
-QString Parser::toMarkdown(QString in)
+auto Parser::toMarkdown(QString in) -> QString
 {
     // replace Windows line breaks
-    in.replace(QChar(QChar::LineSeparator), QStringLiteral("\n"));
+    in.replace(QChar(QChar::LineSeparator), u'\n');
 
     // remove all null characters
     // we can get those from Google Chrome via the clipboard

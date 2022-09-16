@@ -13,16 +13,18 @@ QT_END_NAMESPACE
 class MimeType
 {
 public:
-    explicit MimeType(const To);
-    ~MimeType() {};
+    constexpr explicit inline MimeType(const To to) : currTo(to) {};
+    ~MimeType() = default;
 
-    const QIcon icon();
-    const QString comment();
+    [[nodiscard]] auto icon() const -> const QIcon;
+    [[nodiscard]] auto comment() const -> const QString;
 
-    inline const To type() const { return currTo; };
+    [[nodiscard]] inline auto type() const -> const To { return currTo; };
 
 private:
     To currTo = To::toInvalid;
 };
+
+Q_DECLARE_TYPEINFO(MimeType, Q_RELOCATABLE_TYPE);
 
 #endif // MIMETYPE_H

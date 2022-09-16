@@ -1,9 +1,9 @@
 #include "mainwindow.h"
 
 #include <QApplication>
+#include <QCommandLineParser>
 #include <QLocale>
 #include <QTranslator>
-#include <QCommandLineParser>
 
 
 int main(int argc, char *argv[])
@@ -15,12 +15,8 @@ int main(int argc, char *argv[])
 #endif
 
     QApplication a(argc, argv);
-    a.setApplicationDisplayName(QStringLiteral("Converter"));
-    a.setApplicationVersion(QStringLiteral(APP_VERSION));
-
-    static constexpr QChar underscore[] = {
-        QLatin1Char('_')
-    };
+    QApplication::setApplicationDisplayName(QStringLiteral("Converter"));
+    QApplication::setApplicationVersion(QStringLiteral(APP_VERSION));
 
     const QLocale system = QLocale::system();
 
@@ -28,16 +24,16 @@ int main(int argc, char *argv[])
 
     // load translation for Qt
     if (qtTranslator.load(system, QStringLiteral("qtbase"),
-                          QString::fromRawData(underscore, 1),
+                          QStringLiteral("_"),
                           QStringLiteral(
                               ":/qtTranslations/")))
-        a.installTranslator(&qtTranslator);
+        QApplication::installTranslator(&qtTranslator);
 
     // try to load translation for current locale from resource file
     if (translator.load(system, QStringLiteral("Converter"),
-                        QString::fromRawData(underscore, 1),
+                        QStringLiteral("_"),
                         QStringLiteral(":/translations")))
-        a.installTranslator(&translator);
+        QApplication::installTranslator(&translator);
 
     QCommandLineParser parser;
     parser.addHelpOption();
@@ -56,5 +52,5 @@ int main(int argc, char *argv[])
 
     w.show();
 
-    return a.exec();
+    return QApplication::exec();
 }

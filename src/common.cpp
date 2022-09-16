@@ -3,7 +3,7 @@
 #include <QPalette>
 
 
-const bool isDarkMode()
+auto isDarkMode() -> const bool
 {
     static const QColor back = QPalette().base().color();
     static int r, g, b, a;

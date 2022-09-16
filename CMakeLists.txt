@@ -16,6 +16,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools PrintSupport)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools PrintSupport)
 
+if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux" AND NOT CMAKE_CROSSCOMPILING)
+    set(LINUX TRUE)
+endif()
 
 if (EMSCRIPTEN)
     add_compile_definitions(NO_THREADING)
@@ -104,7 +107,12 @@ ENDIF(WIN32)
 target_include_directories(converter PRIVATE ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(converter PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::PrintSupport ${INTL_LDFLAGS} ${3rdparty})
 
-target_compile_definitions(converter PUBLIC APP_VERSION="${PROJECT_VERSION}" QT_DISABLE_DEPRECATED_BEFORE=0x051208 QT_NO_REGEXP)
+target_compile_definitions(converter PUBLIC
+    APP_VERSION="${PROJECT_VERSION}"
+    QT_DISABLE_DEPRECATED_BEFORE=0x051208
+    QT_NO_REGEXP
+    QT_USE_QSTRINGBUILDER
+)
 
 set_target_properties(converter PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER org.qtproject.converter
@@ -116,4 +124,31 @@ set_target_properties(converter PROPERTIES
 
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(converter)
+endif()
+
+if(LINUX AND NOT WIN32)
+    include(GNUInstallDirs)
+
+    find_package(ECM 5.86.0 QUIET NO_MODULE)
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
+    if(ECM_FOUND)
+        include(ECMInstallIcons)
+        ecm_install_icons(
+            ICONS
+                ressources/icon/16-apps-SMEConverter.png
+                ressources/icon/24-apps-SMEConverter.png
+                ressources/icon/32-apps-SMEConverter.png
+                ressources/icon/48-apps-SMEConverter.png
+                ressources/icon/64-apps-SMEConverter.png
+                ressources/icon/128-apps-SMEConverter.png
+                ressources/icon/256-apps-SMEConverter.png
+                ressources/icon/512-apps-SMEConverter.png
+            DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/icons
+            THEME hicolor
+        )
+    endif(ECM_FOUND)
+
+    install(TARGETS converter DESTINATION ${CMAKE_INSTALL_BINDIR})
+    install(FILES packaging/SMEConverter.desktop
+            DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/applications)
 endif()

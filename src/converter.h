@@ -1,9 +1,9 @@
 #ifndef CONVERTER_H
 #define CONVERTER_H
 
-#include <QThread>
-#include <QObject>
 #include <QCryptographicHash>
+#include <QObject>
+#include <QThread>
 
 #include "common.h"
 using namespace Common;
@@ -16,17 +16,17 @@ public:
     explicit Converter(QObject *parent = nullptr);
     ~Converter() { quit(); };
 
-    QString markdown2HTML(const QString &);
-    QString markdown2Plain(const QString &);
+    static auto markdown2HTML(const QString &, const bool) -> QString;
+    static auto markdown2Plain(const QString &) -> QString;
 
-    QString html2Markdown(const QString &);
-    QString html2Plain(const QString &);
+    static auto html2Markdown(const QString &) -> QString;
+    static auto html2Plain(const QString &) -> QString;
 
-    QString plain2C(const QString &);
-    QString plain2Sorted(const QString &);
-    QString plain2Hash(const QString &, QCryptographicHash::Algorithm);
+    [[nodiscard]] auto plain2C(const QString &) const -> QString;
+    [[nodiscard]] auto plain2Sorted(const QString &) const -> QString;
+    static auto plain2Hash(const QString &, QCryptographicHash::Algorithm) -> QString;
 
-    QString c2Plain(const QString &);
+    [[nodiscard]] auto c2Plain(const QString &) const -> QString;
 
     // Options for To::toCString
     bool multiLine = true;
@@ -40,18 +40,18 @@ public:
     bool sortNumbers = false;
     bool caseSensetice = true;
 
-public slots:
-    void convert(const QString &, const Common::From &, const Common::To &);
+    // Options for To::toHTML
+    bool github = true;
 
-signals:
-    void htmlReady(const QString &html);
-
-private:
-    void run() override;
-
+    // Variables
     From _from = From::NotSupportet;
     To _to = To::toInvalid;
     QString _in;
+
+    void run() override;
+
+Q_SIGNALS:
+    void htmlReady(const QString &html);
 };
 
 #endif // CONVERTER_H
