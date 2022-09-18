@@ -2,4 +2,4 @@
 android/*
 *.user
 packaging/*.deb
-packaging/Converter/usr/bin/*
+packaging/Converter/usr

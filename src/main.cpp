@@ -18,19 +18,17 @@ int main(int argc, char *argv[])
     QApplication::setApplicationDisplayName(QStringLiteral("Converter"));
     QApplication::setApplicationVersion(QStringLiteral(APP_VERSION));
 
-    const QLocale system = QLocale::system();
-
     QTranslator translator, qtTranslator;
 
     // load translation for Qt
-    if (qtTranslator.load(system, QStringLiteral("qtbase"),
+    if (qtTranslator.load(QLocale::system(), QStringLiteral("qtbase"),
                           QStringLiteral("_"),
                           QStringLiteral(
                               ":/qtTranslations/")))
         QApplication::installTranslator(&qtTranslator);
 
     // try to load translation for current locale from resource file
-    if (translator.load(system, QStringLiteral("Converter"),
+    if (translator.load(QLocale::system(), QStringLiteral("Converter"),
                         QStringLiteral("_"),
                         QStringLiteral(":/translations")))
         QApplication::installTranslator(&translator);
