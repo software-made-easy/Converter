@@ -155,25 +155,25 @@ auto Converter::plain2C(const QString &in) const -> QString
 
         // If option "Split output into multiple lines" is active add a " to the output
         if (multiLine)
-            out + QChar(u'"');
+            out.append(u'"');
 
         // append the line to the output
-        out + line;
+        out.append(line);
 
         // append a "\n" to the output because we are at the end of a line
         if (list.length() -1 > i)
-            out + L1("\\n");
+            out.append(L1("\\n"));
 
         // If option "Split output into multiple lines" is active add a " and \n to the output
         if (multiLine) {
-            out + QChar(u'"');
-            out + QChar(u'\n');
+            out.append(u'"');
+            out.append(u'\n');
         }
     }
 
     if (!multiLine) {
         out.prepend(QChar(u'"'));
-        out+ QChar(u'"');
+        out.append(u'"');
     }
 
     return out;
@@ -229,9 +229,9 @@ auto Converter::c2Plain(const QString &in) const -> QString
         line = line.trimmed();
 
         if (line.length() > 1) {
-            if (line.startsWith(u'"'))
+            if (line.startsWith(u'"') && !line.startsWith(L1("\\\"")))
                 line.remove(0, 1);
-            if (line.endsWith(u'"'))
+            if (line.endsWith(u'"') && !line.endsWith(L1("\\\"")))
                 line.remove(line.length() -1, 1);
         }
 
@@ -242,7 +242,7 @@ auto Converter::c2Plain(const QString &in) const -> QString
         if (escapePercent)
             line.replace(L1("%%"), L1("%"));
 
-        out + line;
+        out.append(line);
     }
 
     return out;
