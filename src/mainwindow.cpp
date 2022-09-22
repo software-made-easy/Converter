@@ -572,7 +572,7 @@ void MainWindow::detectFile(const QString &fileName, const QByteArray &fileConte
         return;
     }
 
-    QMimeDatabase mimeDatabase;
+    static QMimeDatabase mimeDatabase;
     const QFileInfo fi(fileName);
     const QMimeType mimeType = mimeDatabase.mimeTypeForFileNameAndData(fileName, fileContents);
     if (!mimeType.isValid()) {
@@ -669,7 +669,7 @@ void MainWindow::loadSettings() {
     recentOpened = settings->value(QStringLiteral("recent"), QStringList()).toStringList();
     if (!recentOpened.isEmpty()) {
         if (recentOpened.at(0).isEmpty()) {
-            recentOpened.takeFirst();
+            recentOpened.removeFirst();
         }
     }
 
