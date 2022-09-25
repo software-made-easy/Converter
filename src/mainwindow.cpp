@@ -7,18 +7,13 @@
 #include "ui_mainwindow.h"
 
 #include <QComboBox>
-#include <QDebug>
-#include <QDesktopServices>
 #include <QFileDialog>
 #include <QFileInfo>
-#include <QFileSystemWatcher>
 #include <QMessageBox>
 #include <QMimeDatabase>
-#include <QSaveFile>
 #include <QScreen>
 #include <QScrollBar>
 #include <QSettings>
-#include <QTemporaryFile>
 #include <QTextStream>
 #include <QTimer>
 #include <QToolButton>
