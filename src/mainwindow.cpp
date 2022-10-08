@@ -5,6 +5,7 @@
 #include "mimetype.h"
 #include "typeparser.h"
 #include "ui_mainwindow.h"
+#include "imagedialouge.h"
 
 #include <QComboBox>
 #include <QFileDialog>
@@ -44,8 +45,8 @@ MainWindow::MainWindow(const QString &file, QWidget *parent)
     QMetaObject::invokeMethod(this, "loadIcons", Qt::QueuedConnection);
     setupThings();
 
-    settings = new QSettings(QStringLiteral("SME"),
-                             QStringLiteral("Converter"), this);
+    settings = new QSettings(STR("SME"),
+                             STR("Converter"), this);
 
     loadSettings();
     updateOpened();
@@ -105,7 +106,7 @@ MainWindow::MainWindow(const QString &file, QWidget *parent)
 
 void MainWindow::setText(const QString &html)
 {
-    if (converter->_to == To::toPreview)
+    if (converter->to == To::toPreview)
         ui->plainTextEdit->document()->setHtml(html);
     else
         ui->plainTextEdit->setPlainText(html);
@@ -114,7 +115,7 @@ void MainWindow::setText(const QString &html)
 void MainWindow::onFromChanged()
 {
     const From currentFrom = From(ui->from->currentData().toInt());
-    converter->_from = currentFrom;
+    converter->from = currentFrom;
 
     if (currentFrom == From::HTML)
         htmlHighliter->setDocument(ui->textEdit->document());
@@ -133,7 +134,7 @@ void MainWindow::onFromChanged()
 void MainWindow::onToChanged()
 {
     const To currentTo = To(ui->to->currentData().toInt());
-    converter->_to = currentTo;
+    converter->to = currentTo;
 
     if (currentTo == To::toHTML)
         htmlHighliter->setDocument(ui->plainTextEdit->document());
@@ -151,7 +152,7 @@ void MainWindow::onToChanged()
                                                      ui->actionTrimm, ui->actionRemove_duplicates,
                                                      ui->actionSort_numbers, ui->actionCase_sensetive}));
     }
-    else if (converter->_from == From::Markdown && currentTo == To::toHTML)
+    else if (converter->from == From::Markdown && currentTo == To::toHTML)
         ui->menu_Options->addAction(ui->actionUse_GitHub_s_dialect);
     else
         ui->menu_Options->setEnabled(false);
@@ -174,9 +175,9 @@ void MainWindow::setupThings()
     QMimeDatabase base;
     TypeParser parser;
 
-    const QMimeType markdown = base.mimeTypeForName(QStringLiteral("text/markdown"));
-    const QMimeType html = base.mimeTypeForName(QStringLiteral("text/html"));
-    const QMimeType plain = base.mimeTypeForName(QStringLiteral("text/plain"));
+    const QMimeType markdown = base.mimeTypeForName(STR("text/markdown"));
+    const QMimeType html = base.mimeTypeForName(STR("text/html"));
+    const QMimeType plain = base.mimeTypeForName(STR("text/plain"));
 
     constexpr MimeType c(To::toCString);
 
@@ -190,7 +191,7 @@ void MainWindow::setupThings()
                       c.comment(), From::CString);
 
     ui->from->setCurrentIndex(0);
-    converter->_from = From::Plain;
+    converter->from = From::Plain;
     ui->textEdit->setFocus(Qt::FocusReason::NoFocusReason);
 
     ui->actionOpen->setShortcuts(QKeySequence::Open);
@@ -230,26 +231,26 @@ void MainWindow::setupThings()
 
 void MainWindow::loadIcons()
 {
-    loadIcon(QStringLiteral("application-exit"), ui->actionExit);
-    loadIcon(QStringLiteral("document-open"), ui->actionOpen);
-    loadIcon(QStringLiteral("document-print-preview"), ui->actionPrintPreview);
-    loadIcon(QStringLiteral("document-print"), ui->actionPrint);
-    loadIcon(QStringLiteral("edit-copy"), ui->actionCopy);
-    loadIcon(QStringLiteral("edit-cut"), ui->actionCut);
-    loadIcon(QStringLiteral("edit-paste"), ui->actionPaste);
-    loadIcon(QStringLiteral("edit-redo"), ui->actionRedo);
-    loadIcon(QStringLiteral("edit-select-all"), ui->actionSelectAll);
-    loadIcon(QStringLiteral("edit-undo"), ui->actionUndo);
-    loadIcon(QStringLiteral("edit-copy"), ui->actionCopy);
-    loadIcon(QStringLiteral("help-about"), ui->actionAbout);
-    loadIcon(QStringLiteral("text-wrap"), ui->actionWord_wrap);
+    loadIcon(STR("application-exit"), ui->actionExit);
+    loadIcon(STR("document-open"), ui->actionOpen);
+    loadIcon(STR("document-print-preview"), ui->actionPrintPreview);
+    loadIcon(STR("document-print"), ui->actionPrint);
+    loadIcon(STR("edit-copy"), ui->actionCopy);
+    loadIcon(STR("edit-cut"), ui->actionCut);
+    loadIcon(STR("edit-paste"), ui->actionPaste);
+    loadIcon(STR("edit-redo"), ui->actionRedo);
+    loadIcon(STR("edit-select-all"), ui->actionSelectAll);
+    loadIcon(STR("edit-undo"), ui->actionUndo);
+    loadIcon(STR("edit-copy"), ui->actionCopy);
+    loadIcon(STR("help-about"), ui->actionAbout);
+    loadIcon(STR("text-wrap"), ui->actionWord_wrap);
 
-    ui->menuRecentlyOpened->setIcon(QIcon::fromTheme(QStringLiteral("document-open-recent"),
-                                                     QIcon(QStringLiteral(":/icons/document-open-recent.svg"))));
+    ui->menuRecentlyOpened->setIcon(QIcon::fromTheme(STR("document-open-recent"),
+                                                     QIcon(STR(":/icons/document-open-recent.svg"))));
 
     toolbutton->setIcon(ui->menuRecentlyOpened->icon());
 
-    setWindowIcon(QIcon(QStringLiteral(":/icon/Icon.svg")));
+    setWindowIcon(QIcon(STR(":/icon/Icon.svg")));
 }
 
 void MainWindow::loadIcon(const QString &name, QAction *a)
@@ -348,7 +349,7 @@ void MainWindow::printPreview(QPrinter *printer)
 
 void MainWindow::onTextChanged()
 {
-    converter->_in = ui->textEdit->toPlainText();
+    converter->in = std::move(ui->textEdit->toPlainText());
 
 #ifdef NO_THREADING
     converter->run();
@@ -367,6 +368,8 @@ void MainWindow::loadFile(const QString &f)
 
 void MainWindow::openFile(const QString &newFile)
 {
+    static QMimeDatabase base;
+
     QFile f(newFile);
 
     if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -392,7 +395,25 @@ void MainWindow::openFile(const QString &newFile)
 
     path = newFile;
 
-    ui->textEdit->setPlainText(QString::fromLocal8Bit(f.readAll()));
+    const QByteArray &content = f.readAll();
+
+    QMimeType mime = base.mimeTypeForFileNameAndData(newFile, content);
+    const QString name = mime.name();
+
+    ui->textEdit->setPlainText(QLatin1String());
+
+    if (name == L1("text/plain"))
+        ui->from->setCurrentIndex(0);
+    else if (name == L1("text/markdown"))
+        ui->from->setCurrentIndex(1);
+    else if (name == L1("text/html"))
+        ui->from->setCurrentIndex(2);
+    else if (name.startsWith(L1("image/"))) {
+        ImageDialouge dia(newFile, this);
+        dia.exec();
+    }
+
+    ui->textEdit->setPlainText(QString::fromLocal8Bit(content));
 
     setWindowFilePath(QFileInfo(newFile).fileName());
 
@@ -401,16 +422,6 @@ void MainWindow::openFile(const QString &newFile)
     QTimer::singleShot(10000, statusBar(), &QStatusBar::hide);
 
     updateOpened();
-
-    QMimeType mime = QMimeDatabase().mimeTypeForFile(newFile);
-    const QString name = mime.name();
-
-    if (name == L1("text/plain"))
-        ui->from->setCurrentIndex(0);
-    else if (name == L1("text/markdown"))
-        ui->from->setCurrentIndex(1);
-    else if (name == L1("text/html"))
-        ui->from->setCurrentIndex(2);
 
     QGuiApplication::restoreOverrideCursor();
 }
@@ -525,7 +536,7 @@ void MainWindow::updateOpened() {
 
     for (int i = 0; i < recentOpened.count(); ++i) {
         const QString document = recentOpened.at(i);
-        auto *action = new QAction(QStringLiteral("&%1 | %2").arg(QString::number(i + 1),
+        auto *action = new QAction(STR("&%1 | %2").arg(QString::number(i + 1),
                                                                   document), this);
         connect(action, &QAction::triggered, this, &MainWindow::openRecent);
 
@@ -647,7 +658,7 @@ void MainWindow::closeEvent(QCloseEvent *e)
 }
 
 void MainWindow::loadSettings() {
-    const QByteArray geo = settings->value(QStringLiteral("geometry"),
+    const QByteArray geo = settings->value(STR("geometry"),
                                            QByteArrayLiteral("")).toByteArray();
     if (geo.isEmpty()) {
         const QRect availableGeometry = QGuiApplication::screenAt(pos())->availableGeometry();
@@ -659,24 +670,24 @@ void MainWindow::loadSettings() {
         restoreGeometry(geo);
     }
 
-    restoreState(settings->value(QStringLiteral("state"), QByteArrayLiteral("")).toByteArray());
+    restoreState(settings->value(STR("state"), QByteArrayLiteral("")).toByteArray());
 
-    recentOpened = settings->value(QStringLiteral("recent"), QStringList()).toStringList();
+    recentOpened = settings->value(STR("recent"), QStringList()).toStringList();
     if (!recentOpened.isEmpty()) {
         if (recentOpened.at(0).isEmpty()) {
             recentOpened.removeFirst();
         }
     }
 
-    const bool lineWrap = settings->value(QStringLiteral("lineWrap"), true).toBool();
+    const bool lineWrap = settings->value(STR("lineWrap"), true).toBool();
     changeWordWrap(lineWrap);
 }
 
 void MainWindow::saveSettings() {
-    settings->setValue(QStringLiteral("geometry"), saveGeometry());
-    settings->setValue(QStringLiteral("state"), saveState());
-    settings->setValue(QStringLiteral("recent"), recentOpened);
-    settings->setValue(QStringLiteral("lineWrap"), ui->actionWord_wrap->isChecked());
+    settings->setValue(STR("geometry"), saveGeometry());
+    settings->setValue(STR("state"), saveState());
+    settings->setValue(STR("recent"), recentOpened);
+    settings->setValue(STR("lineWrap"), ui->actionWord_wrap->isChecked());
     settings->sync();
 }
 

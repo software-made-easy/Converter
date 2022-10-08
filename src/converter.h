@@ -44,9 +44,9 @@ public:
     bool github = true;
 
     // Variables
-    From _from = From::NotSupportet;
-    To _to = To::toInvalid;
-    QString _in;
+    From from = From::NotSupportet;
+    To to = To::toInvalid;
+    QString in;
 
     void run() override;
 

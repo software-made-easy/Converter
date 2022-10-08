@@ -62,6 +62,8 @@ set(PROJECT_SOURCES
         src/mimetype.cpp
         src/converter.h
         src/converter.cpp
+        src/imagedialouge.h
+        src/imagedialouge.cpp
         common.h
         ui/mainwindow.ui
         ${RC_FILES}

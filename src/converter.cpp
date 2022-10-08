@@ -42,66 +42,66 @@ Converter::Converter(QObject *parent)
 
 void Converter::run()
 {
-    if (_from != From::NotSupportet &&
-            _to != To::toInvalid) {
+    if (from != From::NotSupportet &&
+            to != To::toInvalid) {
         QString out;
 
-        if (_from == From::Markdown) {
-            switch (_to) {
+        if (from == From::Markdown) {
+            switch (to) {
             case To::toPreview:
             case To::toHTML:
-                out = markdown2HTML(_in, github);
+                out = markdown2HTML(in, github);
                 break;
             case To::toPlain:
-                out = markdown2Plain(_in);
+                out = markdown2Plain(in);
                 break;
             default:
                 break;
             }
         }
-        else if (_from == From::HTML) {
-            switch (_to) {
+        else if (from == From::HTML) {
+            switch (to) {
             case To::toMarkdown:
-                out = html2Markdown(_in);
+                out = html2Markdown(in);
                 break;
             case To::toPlain:
-                out = html2Plain(_in);
+                out = html2Plain(in);
                 break;
             case To::toPreview:
-                out = _in;
+                out = in;
                 break;
             default:
                 break;
             }
         }
-        else if (_from == From::Plain) {
-            switch (_to) {
+        else if (from == From::Plain) {
+            switch (to) {
             case To::toCString:
-                out = plain2C(_in);
+                out = plain2C(in);
                 break;
             case To::toHTMLEscaped:
-                out = _in.toHtmlEscaped();
+                out = in.toHtmlEscaped();
                 break;
             case To::toSorted:
-                out = plain2Sorted(_in);
+                out = plain2Sorted(in);
                 break;
             case To::toMD5:
-                out = plain2Hash(_in, QCryptographicHash::Md5);
+                out = plain2Hash(in, QCryptographicHash::Md5);
                 break;
             case To::toSha256:
-                out = plain2Hash(_in, QCryptographicHash::Sha256);
+                out = plain2Hash(in, QCryptographicHash::Sha256);
                 break;
             case To::toSha512:
-                out = plain2Hash(_in, QCryptographicHash::Sha512);
+                out = plain2Hash(in, QCryptographicHash::Sha512);
                 break;
             default:
                 break;
             }
         }
-        else if (_from == From::CString) {
-            switch (_to) {
+        else if (from == From::CString) {
+            switch (to) {
             case To::toPlain:
-                out = c2Plain(_in);
+                out = c2Plain(in);
                 break;
             default:
                 break;

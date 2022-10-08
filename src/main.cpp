@@ -1,3 +1,4 @@
+#include "common.h"
 #include "mainwindow.h"
 
 #include <QApplication>
@@ -15,22 +16,22 @@ int main(int argc, char *argv[])
 #endif
 
     QApplication a(argc, argv);
-    QApplication::setApplicationDisplayName(QStringLiteral("Converter"));
+    QApplication::setApplicationDisplayName(STR("Converter"));
     QApplication::setApplicationVersion(QStringLiteral(APP_VERSION));
 
     QTranslator translator, qtTranslator;
 
     // load translation for Qt
-    if (qtTranslator.load(QLocale::system(), QStringLiteral("qtbase"),
-                          QStringLiteral("_"),
+    if (qtTranslator.load(QLocale::system(), STR("qtbase"),
+                          STR("_"),
                           QStringLiteral(
                               ":/qtTranslations/")))
         QApplication::installTranslator(&qtTranslator);
 
     // try to load translation for current locale from resource file
-    if (translator.load(QLocale::system(), QStringLiteral("Converter"),
-                        QStringLiteral("_"),
-                        QStringLiteral(":/translations")))
+    if (translator.load(QLocale::system(), STR("Converter"),
+                        STR("_"),
+                        STR(":/translations")))
         QApplication::installTranslator(&translator);
 
     QCommandLineParser parser;

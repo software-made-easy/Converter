@@ -9,15 +9,15 @@ auto MimeType::icon() const -> const QIcon
 {
     switch (currTo) {
     case To::toCString:
-        return QIcon::fromTheme(QStringLiteral("text-x-csrc"), QIcon(QStringLiteral(":/icons/text-x-csrc.png")));
+        return QIcon::fromTheme(STR("text-x-csrc"), QIcon(STR(":/icons/text-x-csrc.svg")));
     case To::toSorted:
-        return QIcon::fromTheme(QStringLiteral("sort-name"), QIcon(QStringLiteral(":/icons/sort-name.svg")));
+        return QIcon::fromTheme(STR("sort-name"), QIcon(STR(":/icons/sort-name.svg")));
     case To::toPreview:
-        return QIcon::fromTheme(QStringLiteral("view-preview"), QIcon(QStringLiteral(":/icons/view-preview.svg")));
+        return QIcon::fromTheme(STR("view-preview"), QIcon(STR(":/icons/view-preview.svg")));
     case To::toMD5:
-        return QIcon(QStringLiteral(":/icons/md5.png"));
+        return QIcon(STR(":/icons/md5.svg"));
     case To::toHTMLEscaped:
-        return QIcon::fromTheme(QStringLiteral("text-html"), QIcon(QStringLiteral(":/icons/text-html.png")));
+        return QIcon::fromTheme(STR("text-html"), QIcon(STR(":/icons/text-html.svg")));
     default:
         const QMimeType currMime = TypeParser::mimeForTo(currTo);
 

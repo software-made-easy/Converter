@@ -49,13 +49,13 @@ auto TypeParser::mimeForTo(Common::To to) -> QMimeType
 
     switch (to) {
     case To::toHTML:
-        return base.mimeTypeForName(QStringLiteral("text/html"));
+        return base.mimeTypeForName(STR("text/html"));
     case To::toMarkdown:
-        return base.mimeTypeForName(QStringLiteral("text/markdown"));
+        return base.mimeTypeForName(STR("text/markdown"));
     case To::toPlain:
-        return base.mimeTypeForName(QStringLiteral("text/plain"));
+        return base.mimeTypeForName(STR("text/plain"));
     case To::toImage:
-        return base.mimeTypeForName(QStringLiteral("image/png"));
+        return base.mimeTypeForName(STR("image/png"));
     default:
         return {};
     }
@@ -86,6 +86,6 @@ auto TypeParser::iconForMime(const QMimeType &mime) -> const QIcon
 {
     const QString iconName = mime.iconName();
 
-    return QIcon::fromTheme(iconName, QIcon(QStringLiteral(":/icons/%1").
+    return QIcon::fromTheme(iconName, QIcon(STR(":/icons/%1").
                                             arg(iconName)));
 }

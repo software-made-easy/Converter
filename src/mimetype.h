@@ -19,7 +19,7 @@ public:
     [[nodiscard]] auto icon() const -> const QIcon;
     [[nodiscard]] auto comment() const -> const QString;
 
-    [[nodiscard]] inline auto type() const -> const To { return currTo; };
+    [[nodiscard]] inline constexpr auto type() const -> const To { return currTo; };
 
 private:
     To currTo = To::toInvalid;

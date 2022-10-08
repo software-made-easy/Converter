@@ -13,12 +13,12 @@
         <file>icons/document-open-recent.svg</file>
         <file>icons/document-open.svg</file>
         <file>icons/application-exit.svg</file>
-        <file>icons/text-html.png</file>
-        <file>icons/text-markdown.png</file>
-        <file>icons/text-x-csrc.png</file>
         <file>icons/sort-name.svg</file>
-        <file>icons/md5.png</file>
-        <file>icons/text-plain.png</file>
         <file>icons/view-preview.svg</file>
+        <file>icons/md5.svg</file>
+        <file>icons/text-html.svg</file>
+        <file>icons/text-markdown.svg</file>
+        <file>icons/text-plain.svg</file>
+        <file>icons/text-x-csrc.svg</file>
     </qresource>
 </RCC>

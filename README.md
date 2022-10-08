@@ -42,6 +42,7 @@ Converter, as the name suggests, is a simple and easy program to convert strings
 A preview is available [here](https://software-made-easy.github.io/Converter/converter.html).
 
 Important:
+
 - Performance might be bad
 
 ## Dependencies:
