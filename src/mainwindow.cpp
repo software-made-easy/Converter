@@ -2,10 +2,10 @@
 #include "common.h"
 #include "converter.h"
 #include "highlighter.h"
+#include "imagedialouge.h"
 #include "mimetype.h"
 #include "typeparser.h"
 #include "ui_mainwindow.h"
-#include "imagedialouge.h"
 
 #include <QComboBox>
 #include <QFileDialog>
@@ -102,6 +102,18 @@ MainWindow::MainWindow(const QString &file, QWidget *parent)
     ui->toolBarEdit->addAction(ui->actionSelectAll);
 
     QMetaObject::invokeMethod(this, "loadFile", Qt::QueuedConnection, Q_ARG(QString, file));
+
+#ifndef QT_NO_DEBUG
+    auto *aScreenshot = new QAction(QIcon::fromTheme(STR("gnome-screenshot")), tr("Take screenshot"), this);
+    connect(aScreenshot, &QAction::triggered, this, [this, aScreenshot]{
+        aScreenshot->setVisible(false);
+        QTimer::singleShot(1000, this, [this, aScreenshot]{
+            grab().save(STR("/home/tim/qtprojegt/Converter/docs/images/Example.png"), "PNG", 0);
+            aScreenshot->setVisible(true);
+        });
+    });
+    ui->toolBarEdit->addAction(aScreenshot);
+#endif
 }
 
 void MainWindow::setText(const QString &html)

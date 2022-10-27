@@ -6,13 +6,6 @@
 #include "md4c-html.h"
 
 
-/* Global options. */
-#if MD_UNDERLINE
-static int parser_flags = MD_FLAG_UNDERLINE;
-#else
-static int parser_flags = 0;
-#endif
-
 const QByteArray templateArray = QByteArrayLiteral("<!DOCTYPE html>\n"
                                                     "<html>\n"
                                                     "<head>\n"
@@ -29,17 +22,12 @@ void captureHtmlFragment (const MD_CHAR* data, MD_SIZE data_size, void* userData
 
 auto Parser::toHtml(const QString &in, const int dia) -> QString
 {
-    if (dia == GitHub)
-        parser_flags |= MD_DIALECT_GITHUB;
-    else
-        parser_flags |= MD_DIALECT_COMMONMARK;
-
     const QByteArray array = in.toUtf8(); // Use UTF-8 for better support
     QByteArray out = templateArray;
     out.reserve(array.size() *1.28 + 115);
 
     md_html(array.constData(), array.size(), &captureHtmlFragment, &out,
-            parser_flags, MD_HTML_FLAG_SKIP_UTF8_BOM);
+            MD_DIALECT_GITHUB, MD_HTML_FLAG_DEBUG);
 
     out.append("</body>\n"
                "</html>\n");
