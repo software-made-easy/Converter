@@ -46,27 +46,27 @@ if (ANDROID)
 endif(ANDROID)
 
 set(PROJECT_SOURCES
-        src/main.cpp
-        src/mainwindow.cpp
-        src/mainwindow.h
-        src/common.cpp
-        src/mainwindow.cpp
-        src/mainwindow.h
-        src/markdownparser.cpp
-        src/markdownparser.h
-        src/highlighter.cpp
-        src/highlighter.h
-        src/typeparser.h
-        src/typeparser.cpp
-        src/mimetype.h
-        src/mimetype.cpp
-        src/converter.h
-        src/converter.cpp
-        src/imagedialouge.h
-        src/imagedialouge.cpp
-        common.h
-        ui/mainwindow.ui
-        ${RC_FILES}
+    ${RC_FILES}
+    common.h
+    src/common.cpp
+    src/converter.cpp
+    src/converter.h
+    src/highlighter.cpp
+    src/highlighter.h
+    src/imagedialouge.cpp
+    src/imagedialouge.h
+    src/main.cpp
+    src/mainwindow.cpp
+    src/mainwindow.cpp
+    src/mainwindow.h
+    src/mainwindow.h
+    src/markdownparser.cpp
+    src/markdownparser.h
+    src/mimetype.cpp
+    src/mimetype.h
+    src/typeparser.cpp
+    src/typeparser.h
+    ui/mainwindow.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

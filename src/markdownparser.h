@@ -13,7 +13,7 @@ public:
 
     Q_REQUIRED_RESULT static auto toHtml(const QString &in, const int dia = GitHub) -> QString;
 
-    Q_REQUIRED_RESULT static auto toMarkdown(QString in) -> QString;
+    Q_REQUIRED_RESULT static auto toMarkdown(const QString& in) -> QString;
 };
 
 #endif // MARKDOWNPARSER_H

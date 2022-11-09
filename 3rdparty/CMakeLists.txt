@@ -11,6 +11,9 @@ add_library(md4c-html STATIC ${MD4C_FILES})
 
 include_directories(${CMAKE_CURRENT_LIST_DIR}/md4c/src)
 
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/html2md)
+
 set(3rdparty
     md4c-html
+    html2md-static
 )
