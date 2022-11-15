@@ -501,7 +501,7 @@ void MainWindow::onHelpAbout()
                           "</tr>\n"
                           "<tr>\n"
                           "<td>Homepage:</td>\n"
-                          "<td><a href=\"https://software-made-easy.github.io/Converter/\">https://software-made-easy.github.io/Converter/</a></td>\n"
+                          "<td><a href=\"https://tim-gromeyer.github.io/Converter/\">https://tim-gromeyer.github.io/Converter/</a></td>\n"
                           "</tr>\n"
                           "</tbody>\n"
                           "</table>\n"

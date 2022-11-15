@@ -23,12 +23,27 @@ void captureHtmlFragment (const MD_CHAR* data, MD_SIZE data_size, void* userData
 
 auto Parser::toHtml(const QString &in, const int dia) -> QString
 {
+#if MD_UNDERLINE
+    unsigned parser_flags = MD_FLAG_UNDERLINE;
+#else
+    unsigned parser_flags = 0;
+#endif
+
+    if (dia == GitHub)
+        parser_flags |= MD_DIALECT_GITHUB;
+    else
+        parser_flags |= MD_DIALECT_COMMONMARK;
+
     const QByteArray array = in.toUtf8(); // Use UTF-8 for better support
     QByteArray out = templateArray;
     out.reserve(array.size() *1.28 + 115);
 
+    static MD_TOC_OPTIONS toc;
+    toc.depth = 0;
+    toc.toc_placeholder = "[TOC]";
+
     md_html(array.constData(), array.size(), &captureHtmlFragment, &out,
-            MD_DIALECT_GITHUB, MD_HTML_FLAG_DEBUG);
+            parser_flags, MD_HTML_FLAG_SKIP_UTF8_BOM, &toc);
 
     out.append("</body>\n"
                "</html>\n");
