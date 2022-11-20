@@ -3,3 +3,4 @@ android/*
 *.user
 packaging/*.deb
 packaging/Converter/usr
+build*

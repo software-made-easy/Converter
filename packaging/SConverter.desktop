@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=SConverter
+GenericName=SConverter
+Comment=Start string converter
+Comment[de]=Starte Zeichenketten-Converter
+Exec=sconverter
+Icon=SConverter
+Terminal=false
+Type=Application
+Categories=Utility; Qt
+Keywords=text;convert;converter;string;

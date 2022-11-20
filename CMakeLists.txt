@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(Converter VERSION 0.5.0 LANGUAGES CXX C)
+project(Converter VERSION 1.0.0
+    DESCRIPTION "Simple program for converting strings"
+    HOMEPAGE_URL "https://tim-gromeyer.github.io/md_Converter.html"
+    LANGUAGES CXX C)
+set(PROJECT_CONTACT "sakul8826@gmail.com")
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -11,6 +15,14 @@ set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_SOURCE_DIR}/ui)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Build type
+if (CMAKE_BUILD_TYPE)
+    message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+else()
+    message(STATUS "Build type not specified. Release is used.")
+    set(CMAKE_BUILD_TYPE "Release")
+endif()
 
 # Svg is nessesary for android
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools PrintSupport)
@@ -31,6 +43,12 @@ set(RC_FILES
     translations/translations.qrc
 )
 
+# Include windows icon
+if(WIN32)
+    list(APPEND PROJECT_SOURCES ressources/logo/Icon.rc)
+endif()
+
+# Include 3rdparty libs and translations
 include(3rdparty/CMakeLists.txt)
 include(cmake/TranslationUtils.cmake)
 
@@ -124,33 +142,45 @@ set_target_properties(converter PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
+set_target_properties(converter PROPERTIES OUTPUT_NAME "sconverter")
+
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(converter)
 endif()
 
-if(LINUX AND NOT WIN32)
-    include(GNUInstallDirs)
+# Packaging
+include(GNUInstallDirs)
 
-    find_package(ECM 5.86.0 QUIET NO_MODULE)
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
-    if(ECM_FOUND)
-        include(ECMInstallIcons)
-        ecm_install_icons(
-            ICONS
-                ressources/icon/16-apps-SMEConverter.png
-                ressources/icon/24-apps-SMEConverter.png
-                ressources/icon/32-apps-SMEConverter.png
-                ressources/icon/48-apps-SMEConverter.png
-                ressources/icon/64-apps-SMEConverter.png
-                ressources/icon/128-apps-SMEConverter.png
-                ressources/icon/256-apps-SMEConverter.png
-                ressources/icon/512-apps-SMEConverter.png
-            DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/icons
-            THEME hicolor
-        )
-    endif(ECM_FOUND)
+find_package(ECM 5.86.0 QUIET NO_MODULE)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
+if(ECM_FOUND)
+    include(ECMInstallIcons)
+    ecm_install_icons(
+        ICONS
+            ressources/icon/16-apps-SConverter.png
+            ressources/icon/24-apps-SConverter.png
+            ressources/icon/32-apps-SConverter.png
+            ressources/icon/48-apps-SConverter.png
+            ressources/icon/64-apps-SConverter.png
+            ressources/icon/128-apps-SConverter.png
+            ressources/icon/256-apps-SConverter.png
+        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/icons
+        THEME hicolor
+    )
+endif()
 
-    install(TARGETS converter DESTINATION ${CMAKE_INSTALL_BINDIR})
-    install(FILES packaging/SMEConverter.desktop
+install(TARGETS converter DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+# Desktop shortcut for linux
+if(LINUX)
+    install(FILES packaging/SConverter.desktop
             DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/applications)
 endif()
+
+# Icon for windows
+if(WIN32)
+    install(FILES ressouces/icon/Icon.ico
+            DESTINATION .)
+endif()
+
+include(cmake/Packaging.cmake)

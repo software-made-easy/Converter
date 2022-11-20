@@ -6,7 +6,6 @@
 asciiart::asciiart(QWidget *parent)
     : QDialog(parent)
 {
-
 }
 
 QString asciiart::toAsciiArt(QImage *img)
