@@ -5,26 +5,17 @@
 [![GitHub release](https://img.shields.io/github/release/tim-gromeyer/Converter.svg)](https://github.com/tim-gromeyer/Converter/releases/)
 
 
-# [Converter](https://tim-gromeyer.github.io/Converter/)
+# [SConverter](https://tim-gromeyer.github.io/Converter/)
 
-Converter, as the name suggests, is a simple and easy program to convert strings.
+Simple, fast, and powerful: convert your strings with SConverter.
 
-## Table of contents
+## Features
 
-1. [Features](#features)
-2. [Preview](#preview)
-3. [Dependencies](#dependencies)
-
--------
-
-## Features:
-
-- Save and load files
-- Undo-Redo
-- Preview converted strings in real time (<1 ms)
+- Undo and redo actions
+- Real-time preview with less than 1 ms delay
 - Syntax highlighting editor
-- Poor in resources
-- Quick opening of recent files (Button in toolbar or in the file menu)
+- Light on resources
+- Quick access to recent files through the toolbar or file menu
 - Open source
 - Native look and feel
 
