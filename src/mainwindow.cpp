@@ -31,7 +31,6 @@ auto operator<<(QTextStream &stream, const QStringList &list) -> QTextStream &
     return stream;
 }
 
-
 MainWindow::MainWindow(const QString &file, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -45,8 +44,7 @@ MainWindow::MainWindow(const QString &file, QWidget *parent)
     QMetaObject::invokeMethod(this, "loadIcons", Qt::QueuedConnection);
     setupThings();
 
-    settings = new QSettings(STR("SME"),
-                             STR("Converter"), this);
+    settings = new QSettings(STR("SME"), STR("Converter"), this);
 
     loadSettings();
     updateOpened();
@@ -61,20 +59,16 @@ MainWindow::MainWindow(const QString &file, QWidget *parent)
     connect(ui->actionCopy, &QAction::triggered, this, &MainWindow::copy);
     connect(ui->actionPaste, &QAction::triggered, this, &MainWindow::paste);
 
-    connect(ui->actionWord_wrap, &QAction::triggered,
-            this, &MainWindow::changeWordWrap);
-    connect(ui->actionSelectAll, &QAction::triggered,
-            this, &MainWindow::selectAll);
-    connect(ui->actionRedo, &QAction::triggered,
-            ui->textEdit, &QTextEdit::undo);
-    connect(ui->actionRedo, &QAction::triggered,
-            ui->textEdit, &QTextEdit::undo);
-    connect(ui->textEdit->document(), &QTextDocument::contentsChanged,
-            this, &MainWindow::onTextChanged);
-    connect(converter, &Converter::htmlReady,
-            this, &MainWindow::setText);
-    connect(ui->actionDetect_mime_type, &QAction::triggered,
-            this, &MainWindow::onDetectFile);
+    connect(ui->actionWord_wrap, &QAction::triggered, this, &MainWindow::changeWordWrap);
+    connect(ui->actionSelectAll, &QAction::triggered, this, &MainWindow::selectAll);
+    connect(ui->actionRedo, &QAction::triggered, ui->textEdit, &QTextEdit::undo);
+    connect(ui->actionRedo, &QAction::triggered, ui->textEdit, &QTextEdit::undo);
+    connect(ui->textEdit->document(),
+            &QTextDocument::contentsChanged,
+            this,
+            &MainWindow::onTextChanged);
+    connect(converter, &Converter::htmlReady, this, &MainWindow::setText);
+    connect(ui->actionDetect_mime_type, &QAction::triggered, this, &MainWindow::onDetectFile);
 
     ui->actionUndo->setEnabled(false);
     ui->actionRedo->setEnabled(false);
@@ -104,10 +98,12 @@ MainWindow::MainWindow(const QString &file, QWidget *parent)
     QMetaObject::invokeMethod(this, "loadFile", Qt::QueuedConnection, Q_ARG(QString, file));
 
 #ifndef QT_NO_DEBUG
-    auto *aScreenshot = new QAction(QIcon::fromTheme(STR("gnome-screenshot")), tr("Take screenshot"), this);
-    connect(aScreenshot, &QAction::triggered, this, [this, aScreenshot]{
+    auto *aScreenshot = new QAction(QIcon::fromTheme(STR("gnome-screenshot")),
+                                    tr("Take screenshot"),
+                                    this);
+    connect(aScreenshot, &QAction::triggered, this, [this, aScreenshot] {
         aScreenshot->setVisible(false);
-        QTimer::singleShot(1000, this, [this, aScreenshot]{
+        QTimer::singleShot(1000, this, [this, aScreenshot] {
             grab().save(STR("/home/tim/qtprojegt/Converter/docs/images/Example.png"), "PNG", 0);
             aScreenshot->setVisible(true);
         });
@@ -138,8 +134,7 @@ void MainWindow::onFromChanged()
     ui->to->clear();
 
     for (MimeType &mime : mimes) {
-        ui->to->addItem(mime.icon(),
-                        mime.comment(), mime.type());
+        ui->to->addItem(mime.icon(), mime.comment(), mime.type());
     }
 }
 
@@ -156,15 +151,17 @@ void MainWindow::onToChanged()
     ui->menu_Options->clear();
     ui->menu_Options->setEnabled(true);
     if (currentTo == To::toCString) {
-        ui->menu_Options->addActions(QList<QAction*>({ui->actionescape_character_to_for_printf_formatting_string,
-                                                     ui->actionSplit_output_into_multiple_lines}));
-    }
-    else if (currentTo == To::toSorted) {
-        ui->menu_Options->addActions(QList<QAction*>({ui->actionSort, ui->actionSkip_empty,
-                                                     ui->actionTrimm, ui->actionRemove_duplicates,
-                                                     ui->actionSort_numbers, ui->actionCase_sensetive}));
-    }
-    else if (converter->from == From::Markdown && currentTo == To::toHTML)
+        ui->menu_Options->addActions(
+            QList<QAction *>({ui->actionescape_character_to_for_printf_formatting_string,
+                              ui->actionSplit_output_into_multiple_lines}));
+    } else if (currentTo == To::toSorted) {
+        ui->menu_Options->addActions(QList<QAction *>({ui->actionSort,
+                                                       ui->actionSkip_empty,
+                                                       ui->actionTrimm,
+                                                       ui->actionRemove_duplicates,
+                                                       ui->actionSort_numbers,
+                                                       ui->actionCase_sensetive}));
+    } else if (converter->from == From::Markdown && currentTo == To::toHTML)
         ui->menu_Options->addAction(ui->actionUse_GitHub_s_dialect);
     else
         ui->menu_Options->setEnabled(false);
@@ -179,10 +176,11 @@ void MainWindow::setupThings()
     htmlHighliter = new Highliter(this);
     converter = new Converter(this);
 
-    connect(ui->from, qOverload<int>(&QComboBox::currentIndexChanged),
-            this, &MainWindow::onFromChanged);
-    connect(ui->to, qOverload<int>(&QComboBox::currentIndexChanged),
-            this, &MainWindow::onToChanged);
+    connect(ui->from,
+            qOverload<int>(&QComboBox::currentIndexChanged),
+            this,
+            &MainWindow::onFromChanged);
+    connect(ui->to, qOverload<int>(&QComboBox::currentIndexChanged), this, &MainWindow::onToChanged);
 
     QMimeDatabase base;
     TypeParser parser;
@@ -193,14 +191,10 @@ void MainWindow::setupThings()
 
     constexpr MimeType c(To::toCString);
 
-    ui->from->addItem(TypeParser::iconForMime(plain),
-                      plain.comment(), From::Plain);
-    ui->from->addItem(TypeParser::iconForMime(markdown),
-                      markdown.comment(), From::Markdown);
-    ui->from->addItem(TypeParser::iconForMime(html),
-                      html.comment(), From::HTML);
-    ui->from->addItem(c.icon(),
-                      c.comment(), From::CString);
+    ui->from->addItem(TypeParser::iconForMime(plain), plain.comment(), From::Plain);
+    ui->from->addItem(TypeParser::iconForMime(markdown), markdown.comment(), From::Markdown);
+    ui->from->addItem(TypeParser::iconForMime(html), html.comment(), From::HTML);
+    ui->from->addItem(c.icon(), c.comment(), From::CString);
 
     ui->from->setCurrentIndex(0);
     converter->from = From::Plain;
@@ -221,24 +215,48 @@ void MainWindow::setupThings()
     ui->actionCase_sensetive->setChecked(converter->caseSensetice);
     ui->actionSort_numbers->setChecked(converter->sortNumbers);
 
-    connect(ui->actionSplit_output_into_multiple_lines, &QAction::triggered,
-            this, [this](const bool c){ converter->multiLine = c; onTextChanged(); });
-    connect(ui->actionescape_character_to_for_printf_formatting_string, &QAction::triggered,
-            this, [this](const bool c){ converter->escapePercent = c; onTextChanged(); });
-    connect(ui->actionRemove_duplicates, &QAction::triggered,
-            this, [this](const bool c){ converter->removeDuplicates = c; onTextChanged(); });
-    connect(ui->actionSort, &QAction::triggered,
-            this, [this](const bool c){ converter->sort = c; onTextChanged(); });
-    connect(ui->actionSkip_empty, &QAction::triggered,
-            this, [this](const bool c){ converter->skipEmpty = c; onTextChanged(); });
-    connect(ui->actionTrimm, &QAction::triggered,
-            this, [this](const bool c){ converter->trimm = c; onTextChanged(); });
-    connect(ui->actionCase_sensetive, &QAction::triggered,
-            this, [this](const bool c){ converter->caseSensetice = c; onTextChanged(); });
-    connect(ui->actionSort_numbers, &QAction::triggered,
-            this, [this](const bool c){ converter->sortNumbers = c; onTextChanged(); });
-    connect(ui->actionUse_GitHub_s_dialect, &QAction::triggered,
-            this, [this](const bool c){ converter->github = c; onTextChanged(); });
+    connect(ui->actionSplit_output_into_multiple_lines,
+            &QAction::triggered,
+            this,
+            [this](const bool c) {
+                converter->multiLine = c;
+                onTextChanged();
+            });
+    connect(ui->actionescape_character_to_for_printf_formatting_string,
+            &QAction::triggered,
+            this,
+            [this](const bool c) {
+                converter->escapePercent = c;
+                onTextChanged();
+            });
+    connect(ui->actionRemove_duplicates, &QAction::triggered, this, [this](const bool c) {
+        converter->removeDuplicates = c;
+        onTextChanged();
+    });
+    connect(ui->actionSort, &QAction::triggered, this, [this](const bool c) {
+        converter->sort = c;
+        onTextChanged();
+    });
+    connect(ui->actionSkip_empty, &QAction::triggered, this, [this](const bool c) {
+        converter->skipEmpty = c;
+        onTextChanged();
+    });
+    connect(ui->actionTrimm, &QAction::triggered, this, [this](const bool c) {
+        converter->trimm = c;
+        onTextChanged();
+    });
+    connect(ui->actionCase_sensetive, &QAction::triggered, this, [this](const bool c) {
+        converter->caseSensetice = c;
+        onTextChanged();
+    });
+    connect(ui->actionSort_numbers, &QAction::triggered, this, [this](const bool c) {
+        converter->sortNumbers = c;
+        onTextChanged();
+    });
+    connect(ui->actionUse_GitHub_s_dialect, &QAction::triggered, this, [this](const bool c) {
+        converter->github = c;
+        onTextChanged();
+    });
 }
 
 void MainWindow::loadIcons()
@@ -257,8 +275,9 @@ void MainWindow::loadIcons()
     loadIcon(STR("help-about"), ui->actionAbout);
     loadIcon(STR("text-wrap"), ui->actionWord_wrap);
 
-    ui->menuRecentlyOpened->setIcon(QIcon::fromTheme(STR("document-open-recent"),
-                                                     QIcon(STR(":/icons/document-open-recent.svg"))));
+    ui->menuRecentlyOpened->setIcon(
+        QIcon::fromTheme(STR("document-open-recent"),
+                         QIcon(STR(":/icons/document-open-recent.svg"))));
 
     toolbutton->setIcon(ui->menuRecentlyOpened->icon());
 
@@ -267,8 +286,7 @@ void MainWindow::loadIcons()
 
 void MainWindow::loadIcon(const QString &name, QAction *a)
 {
-    a->setIcon(QIcon::fromTheme(name, QIcon(QStringLiteral(
-                                                ":/icons/%1.svg").arg(name))));
+    a->setIcon(QIcon::fromTheme(name, QIcon(QStringLiteral(":/icons/%1.svg").arg(name))));
 }
 
 void MainWindow::changeWordWrap(const bool c)
@@ -276,8 +294,7 @@ void MainWindow::changeWordWrap(const bool c)
     if (c) {
         ui->textEdit->setLineWrapMode(QTextEdit::WidgetWidth);
         ui->plainTextEdit->setLineWrapMode(QTextEdit::WidgetWidth);
-    }
-    else {
+    } else {
         ui->textEdit->setLineWrapMode(QTextEdit::NoWrap);
         ui->plainTextEdit->setLineWrapMode(QTextEdit::NoWrap);
     }
@@ -305,7 +322,7 @@ void MainWindow::paste()
 {
     if (ui->plainTextEdit->hasFocus())
         ui->plainTextEdit->paste();
-        else
+    else
         ui->textEdit->paste();
 }
 
@@ -385,19 +402,23 @@ void MainWindow::openFile(const QString &newFile)
     QFile f(newFile);
 
     if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QMessageBox::warning(this, tr("Couldn't open file"),
-                             tr("Could not open file %1: %2").arg(
-                                 QDir::toNativeSeparators(newFile), f.errorString()));
+        QMessageBox::warning(this,
+                             tr("Couldn't open file"),
+                             tr("Could not open file %1: %2")
+                                 .arg(QDir::toNativeSeparators(newFile), f.errorString()));
         recentOpened.removeOne(newFile);
         updateOpened();
         return;
     }
 
-    constexpr int limit = 400000; // 400KB
+    constexpr int limit = 400'000; // 400KB
     if (f.size() > limit) {
-        const auto out = QMessageBox::warning(this, tr("Large file"),
-                                             tr("This is a large file that can potentially cause performance issues."),
-                                             QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Ok);
+        const auto out = QMessageBox::warning(
+            this,
+            tr("Large file"),
+            tr("This is a large file that can potentially cause performance issues."),
+            QMessageBox::Ok | QMessageBox::Cancel,
+            QMessageBox::Ok);
 
         if (out == QMessageBox::Cancel)
             return;
@@ -431,7 +452,7 @@ void MainWindow::openFile(const QString &newFile)
 
     statusBar()->show();
     statusBar()->showMessage(tr("Opened %1").arg(QDir::toNativeSeparators(newFile)), 0);
-    QTimer::singleShot(10000, statusBar(), &QStatusBar::hide);
+    QTimer::singleShot(10'000, statusBar(), &QStatusBar::hide);
 
     updateOpened();
 
@@ -442,7 +463,8 @@ void MainWindow::onFileOpen()
 {
 #if defined(Q_OS_WASM)
     auto fileContentReady = [this](const QString &newFile, const QByteArray &fileContent) {
-        if (newFile.isEmpty()) return;
+        if (newFile.isEmpty())
+            return;
 
         QGuiApplication::setOverrideCursor(Qt::WaitCursor);
 
@@ -470,24 +492,29 @@ void MainWindow::onFileOpen()
 
         QGuiApplication::restoreOverrideCursor();
     };
-    QFileDialog::getOpenFileContent("Plain (*.txt);; Markdown (*.md *.markdown *.mkd);; HTML (*.html *.htm)", fileContentReady);
+    QFileDialog::getOpenFileContent(
+        "Plain (*.txt);; Markdown (*.md *.markdown *.mkd);; HTML (*.html *.htm)", fileContentReady);
 #else
     QFileDialog dialog(this, tr("Open File"));
-    dialog.setMimeTypeFilters({"text/markdown", "text/plain", "text/html"});
+    dialog.setMimeTypeFilters({"text/markdown", "text/plain", "text/html", "image/*"});
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
-    if (dialog.exec() == QDialog::Rejected) return;
+    if (dialog.exec() == QDialog::Rejected)
+        return;
 
     const QString file = dialog.selectedFiles().at(0);
-    if (file == path || file.isEmpty()) return;
+    if (file == path || file.isEmpty())
+        return;
     openFile(file);
 #endif
 }
 
 void MainWindow::onHelpAbout()
 {
-    QMessageBox::about(this, tr("About Converter"),
+    QMessageBox::about(this,
+                       tr("About Converter"),
                        tr("<h2>Converter</h2>\n"
-                          "<p dir=\"auto\">Converter, as the name suggests, is a simple program to convert strings.</p>\n"
+                          "<p dir=\"auto\">Converter, as the name suggests, is a simple program to "
+                          "convert strings.</p>\n"
                           "<h2>About</h2>\n"
                           "<table class=\"table\" style=\"border-style: none;\">\n"
                           "<tbody>\n"
@@ -501,23 +528,29 @@ void MainWindow::onHelpAbout()
                           "</tr>\n"
                           "<tr>\n"
                           "<td>Homepage:</td>\n"
-                          "<td><a href=\"https://tim-gromeyer.github.io/Converter/\">https://tim-gromeyer.github.io/Converter/</a></td>\n"
+                          "<td><a "
+                          "href=\"https://tim-gromeyer.github.io/Converter/\">https://"
+                          "tim-gromeyer.github.io/Converter/</a></td>\n"
                           "</tr>\n"
                           "</tbody>\n"
                           "</table>\n"
                           "<h2>Credits</h2>\n"
-                          "<p>The conversion from Markdown to HTML is done using the <a href=\"https://github.com/mity/md4c\">md4c</a> library by <em>Martin Mit&aacute;&scaron;</em>.</p>"
-                          ).arg(QStringLiteral(APP_VERSION), QString::fromLatin1(qVersion())));
+                          "<p>The conversion from Markdown to HTML is done using the <a "
+                          "href=\"https://github.com/mity/md4c\">md4c</a> library by <em>Martin "
+                          "Mit&aacute;&scaron;</em>.</p>")
+                           .arg(QStringLiteral(APP_VERSION), QString::fromLatin1(qVersion())));
 }
 
-void MainWindow::openRecent() {
+void MainWindow::openRecent()
+{
     // A QAction represents the action of the user clicking
     const QString filename = qobject_cast<QAction *>(sender())->data().toString();
 
     if (!QFile::exists(filename)) {
-        QMessageBox::warning(this, tr("Warning"),
-                             tr("This file could not be found:\n%1.").arg(
-                                 QDir::toNativeSeparators(filename)));
+        QMessageBox::warning(this,
+                             tr("Warning"),
+                             tr("This file could not be found:\n%1.")
+                                 .arg(QDir::toNativeSeparators(filename)));
         recentOpened.removeOne(filename);
         updateOpened();
         return;
@@ -529,8 +562,9 @@ void MainWindow::openRecent() {
     updateOpened();
 }
 
-void MainWindow::updateOpened() {
-    for (QAction* &a : ui->menuRecentlyOpened->actions()) { // Fixed warning
+void MainWindow::updateOpened()
+{
+    for (QAction *&a : ui->menuRecentlyOpened->actions()) { // Fixed warning
         disconnect(a, &QAction::triggered, this, &MainWindow::openRecent);
         a->deleteLater();
         delete a;
@@ -548,8 +582,7 @@ void MainWindow::updateOpened() {
 
     for (int i = 0; i < recentOpened.count(); ++i) {
         const QString document = recentOpened.at(i);
-        auto *action = new QAction(STR("&%1 | %2").arg(QString::number(i + 1),
-                                                                  document), this);
+        auto *action = new QAction(STR("&%1 | %2").arg(QString::number(i + 1), document), this);
         connect(action, &QAction::triggered, this, &MainWindow::openRecent);
 
         action->setData(document);
@@ -576,7 +609,8 @@ void MainWindow::onDetectFile()
             return;
 
         QFile f(fileName);
-        if (!f.open(QIODevice::ReadOnly)) return;
+        if (!f.open(QIODevice::ReadOnly))
+            return;
 
         detectFile(fileName, f.readAll());
     }
@@ -594,8 +628,9 @@ void MainWindow::detectFile(const QString &fileName, const QByteArray &fileConte
     const QFileInfo fi(fileName);
     const QMimeType mimeType = mimeDatabase.mimeTypeForFileNameAndData(fileName, fileContents);
     if (!mimeType.isValid()) {
-        QMessageBox::warning(this, tr("Unknown File Type"),
-                                 tr("The type of %1 could not be determined.")
+        QMessageBox::warning(this,
+                             tr("Unknown File Type"),
+                             tr("The type of %1 could not be determined.")
                                  .arg(QDir::toNativeSeparators(fileName)));
         return;
     }
@@ -618,8 +653,7 @@ auto MainWindow::formatMimeTypeInfo(const QMimeType &t) -> QString
     if (!aliases.isEmpty())
         str << tr("<tr><td>Aliases:</td><td>") << aliases;
 
-    str << "</td></tr>"
-        << tr("<tr><td>Comment:</td><td>") << t.comment() << "</td></tr>"
+    str << "</td></tr>" << tr("<tr><td>Comment:</td><td>") << t.comment() << "</td></tr>"
         << tr("<tr><td>Icon name:</td><td>") << t.iconName() << "</td></tr>"
         << tr("<tr><td>Generic icon name:</td><td>") << t.genericIconName() << "</td></tr>";
 
@@ -649,15 +683,17 @@ auto MainWindow::formatMimeTypeInfo(const QMimeType &t) -> QString
     return result;
 }
 
-
 void MainWindow::closeEvent(QCloseEvent *e)
 {
-    if (ui->textEdit->document()->isModified() && path.isEmpty() &&
-            !ui->textEdit->toPlainText().isEmpty()) {
-        const int button = QMessageBox::question(this, tr("Save changes?"),
-                                           tr("The file <em>%1</em> has been changed.\n"
-                                              "Do you want to leave anyway?").arg(QDir::toNativeSeparators(path)),
-                                                 QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+    if (ui->textEdit->document()->isModified() && path.isEmpty()
+        && !ui->textEdit->toPlainText().isEmpty()) {
+        const int button = QMessageBox::question(this,
+                                                 tr("Save changes?"),
+                                                 tr("The file <em>%1</em> has been changed.\n"
+                                                    "Do you want to leave anyway?")
+                                                     .arg(QDir::toNativeSeparators(path)),
+                                                 QMessageBox::Yes | QMessageBox::No,
+                                                 QMessageBox::Yes);
         if (button == QMessageBox::No) {
             e->ignore();
             return;
@@ -669,16 +705,14 @@ void MainWindow::closeEvent(QCloseEvent *e)
     QMainWindow::closeEvent(e);
 }
 
-void MainWindow::loadSettings() {
-    const QByteArray geo = settings->value(STR("geometry"),
-                                           QByteArrayLiteral("")).toByteArray();
+void MainWindow::loadSettings()
+{
+    const QByteArray geo = settings->value(STR("geometry"), QByteArrayLiteral("")).toByteArray();
     if (geo.isEmpty()) {
         const QRect availableGeometry = QGuiApplication::screenAt(pos())->availableGeometry();
         resize(availableGeometry.width() / 2, (availableGeometry.height() * 2) / 3);
-        move((availableGeometry.width() - width()) / 2,
-             (availableGeometry.height() - height()) / 2);
-    }
-    else {
+        move((availableGeometry.width() - width()) / 2, (availableGeometry.height() - height()) / 2);
+    } else {
         restoreGeometry(geo);
     }
 
@@ -695,7 +729,8 @@ void MainWindow::loadSettings() {
     changeWordWrap(lineWrap);
 }
 
-void MainWindow::saveSettings() {
+void MainWindow::saveSettings()
+{
     settings->setValue(STR("geometry"), saveGeometry());
     settings->setValue(STR("state"), saveState());
     settings->setValue(STR("recent"), recentOpened);

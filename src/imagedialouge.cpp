@@ -6,7 +6,6 @@
 #include <QPixmap>
 #include <QVBoxLayout>
 
-
 ImageDialouge::ImageDialouge(const QString &file, QWidget *parent)
     : QDialog(parent)
 {

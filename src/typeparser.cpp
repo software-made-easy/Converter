@@ -4,7 +4,6 @@
 #include <QIcon>
 #include <QMimeDatabase>
 
-
 TypeParser::TypeParser() = default;
 
 auto TypeParser::mimesForTo(const QList<To> &toList) -> QList<MimeType>
@@ -69,7 +68,12 @@ auto TypeParser::ToForFrom(Common::From from) -> QList<To>
     case From::Markdown:
         return {To::toHTML, To::toPlain, To::toPreview};
     case From::Plain:
-        return {To::toCString, To::toHTMLEscaped, To::toSorted, To::toMD5, To::toSha256, To::toSha512};
+        return {To::toCString,
+                To::toHTMLEscaped,
+                To::toSorted,
+                To::toMD5,
+                To::toSha256,
+                To::toSha512};
     case From::CString:
         return {To::toPlain};
     default:
@@ -86,6 +90,5 @@ auto TypeParser::iconForMime(const QMimeType &mime) -> const QIcon
 {
     const QString iconName = mime.iconName();
 
-    return QIcon::fromTheme(iconName, QIcon(STR(":/icons/%1").
-                                            arg(iconName)));
+    return QIcon::fromTheme(iconName, QIcon(STR(":/icons/%1").arg(iconName)));
 }

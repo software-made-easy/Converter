@@ -9,11 +9,11 @@ class QIcon;
 class QString;
 QT_END_NAMESPACE
 
-
 class MimeType
 {
 public:
-    constexpr explicit inline MimeType(const To to) : currTo(to) {};
+    constexpr explicit inline MimeType(const To to)
+        : currTo(to){};
     ~MimeType() = default;
 
     [[nodiscard]] auto icon() const -> const QIcon;

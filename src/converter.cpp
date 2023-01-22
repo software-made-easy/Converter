@@ -3,11 +3,9 @@
 
 #include <QTextDocument>
 
-
 using namespace Common;
 
-
-auto sortSensitive(const QString &s1, const QString& s2) -> bool
+auto sortSensitive(const QString &s1, const QString &s2) -> bool
 {
     bool ok = false;
     bool ok2 = false;
@@ -21,7 +19,7 @@ auto sortSensitive(const QString &s1, const QString& s2) -> bool
     return std::lexicographical_compare(s1.begin(), s1.end(), s2.begin(), s2.end());
 }
 
-auto sortInsensitive(const QString &s1, const QString& s2) -> bool
+auto sortInsensitive(const QString &s1, const QString &s2) -> bool
 {
     bool ok = false;
     bool ok2 = false;
@@ -37,13 +35,11 @@ auto sortInsensitive(const QString &s1, const QString& s2) -> bool
 
 Converter::Converter(QObject *parent)
     : QThread{parent}
-{
-}
+{}
 
 void Converter::run()
 {
-    if (from != From::NotSupportet &&
-            to != To::toInvalid) {
+    if (from != From::NotSupportet && to != To::toInvalid) {
         QString out;
 
         if (from == From::Markdown) {
@@ -58,8 +54,7 @@ void Converter::run()
             default:
                 break;
             }
-        }
-        else if (from == From::HTML) {
+        } else if (from == From::HTML) {
             switch (to) {
             case To::toMarkdown:
                 out = html2Markdown(in);
@@ -73,8 +68,7 @@ void Converter::run()
             default:
                 break;
             }
-        }
-        else if (from == From::Plain) {
+        } else if (from == From::Plain) {
             switch (to) {
             case To::toCString:
                 out = plain2C(in);
@@ -97,8 +91,7 @@ void Converter::run()
             default:
                 break;
             }
-        }
-        else if (from == From::CString) {
+        } else if (from == From::CString) {
             switch (to) {
             case To::toPlain:
                 out = c2Plain(in);
@@ -114,8 +107,7 @@ void Converter::run()
 
 auto Converter::markdown2HTML(const QString &in, const bool git) -> QString
 {
-    return Parser::toHtml(in, git ? Parser::GitHub
-                                  : Parser::Commonmark);
+    return Parser::toHtml(in, git ? Parser::GitHub : Parser::Commonmark);
 }
 
 auto Converter::markdown2Plain(const QString &in) -> QString
@@ -127,7 +119,7 @@ auto Converter::markdown2Plain(const QString &in) -> QString
 
 auto Converter::html2Markdown(const QString &in) -> QString
 {
-    return Parser::toMarkdown(in).trimmed();
+    return Parser::toMarkdown(in);
 }
 
 auto Converter::html2Plain(const QString &in) -> QString
@@ -144,13 +136,13 @@ auto Converter::plain2C(const QString &in) const -> QString
     // Split input in each line
     QStringList list = in.split(u'\n');
     for (int i = 0; list.length() > i; ++i) { // Go through each line of input
-        QString line = list[i]; // That's the line
+        QString line = list[i];               // That's the line
 
         line.replace(QChar(u'\\'), L1("\\\\")); // replace "\" with "\\"
-        line.replace(QChar(u'"'), L1("\\\"")); // replace " with \"
+        line.replace(QChar(u'"'), L1("\\\""));  // replace " with \"
 
         // For printf()
-        if(escapePercent)
+        if (escapePercent)
             line.replace(QChar(u'%'), L1("%%"));
 
         // If option "Split output into multiple lines" is active add a " to the output
@@ -161,7 +153,7 @@ auto Converter::plain2C(const QString &in) const -> QString
         out.append(line);
 
         // append a "\n" to the output because we are at the end of a line
-        if (list.length() -1 > i)
+        if (list.length() - 1 > i)
             out.append(L1("\\n"));
 
         // If option "Split output into multiple lines" is active add a " and \n to the output
@@ -202,8 +194,7 @@ auto Converter::plain2Sorted(const QString &in) const -> QString
                 std::sort(out.begin(), out.end(), sortSensitive);
             else
                 std::sort(out.begin(), out.end(), sortInsensitive);
-        }
-        else if (caseSensetice)
+        } else if (caseSensetice)
             out.sort();
         else
             out.sort(Qt::CaseInsensitive);
@@ -232,11 +223,11 @@ auto Converter::c2Plain(const QString &in) const -> QString
             if (line.startsWith(u'"') && !line.startsWith(L1("\\\"")))
                 line.remove(0, 1);
             if (line.endsWith(u'"') && !line.endsWith(L1("\\\"")))
-                line.remove(line.length() -1, 1);
+                line.remove(line.length() - 1, 1);
         }
 
-        line.replace(L1("\\\""), L1("\""));  // Replace \" with "
-        line.replace(L1("\\n"), L1("\n")); // Replace \n with line break
+        line.replace(L1("\\\""), L1("\"")); // Replace \" with "
+        line.replace(L1("\\n"), L1("\n"));  // Replace \n with line break
         line.replace(L1("\\\\"), L1("\\")); // Replace \\ with \
 
         if (escapePercent)
@@ -247,4 +238,3 @@ auto Converter::c2Plain(const QString &in) const -> QString
 
     return out;
 }
-

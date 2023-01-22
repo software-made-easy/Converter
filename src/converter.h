@@ -8,7 +8,6 @@
 #include "common.h"
 using namespace Common;
 
-
 class Converter : public QThread
 {
     Q_OBJECT
@@ -42,6 +41,8 @@ public:
 
     // Options for To::toHTML
     bool github = true;
+
+    // Options for To::toMarkdown
 
     // Variables
     From from = From::NotSupportet;

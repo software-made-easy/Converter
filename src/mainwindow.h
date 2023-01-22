@@ -1,12 +1,12 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-
 #include <QMainWindow>
 
-
 QT_BEGIN_NAMESPACE
-namespace Ui { class MainWindow; }
+namespace Ui {
+class MainWindow;
+}
 class QPrinter;
 class QSettings;
 class QToolButton;
@@ -15,14 +15,13 @@ class Converter;
 class QMimeType;
 QT_END_NAMESPACE
 
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
     explicit MainWindow(const QString &, QWidget *parent = nullptr);
-    ~MainWindow();
+    ~MainWindow() override;
 
     void openFile(const QString &);
 
@@ -67,7 +66,7 @@ private:
     void updateOpened();
     void openRecent();
 
-    static void loadIcon(const QString &name, QAction* a);
+    static void loadIcon(const QString &name, QAction *a);
 
     static auto formatMimeTypeInfo(const QMimeType &) -> QString;
 

@@ -4,7 +4,6 @@
 #include <QIcon>
 #include <QMimeType>
 
-
 auto MimeType::icon() const -> const QIcon
 {
     switch (currTo) {

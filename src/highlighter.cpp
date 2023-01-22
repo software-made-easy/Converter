@@ -2,7 +2,6 @@
 
 #include <QTextDocument>
 
-
 Highliter::Highliter(QObject *parent)
     : QSyntaxHighlighter(parent)
 {
@@ -27,29 +26,30 @@ void Highliter::highlightBlock(const QString &text)
     if (currentBlock() == document()->firstBlock()) {
         setCurrentBlockState(228);
     } else {
-        previousBlockState() == 228 ?
-            setCurrentBlockState(228) :
-            setCurrentBlockState(229);
+        previousBlockState() == 228 ? setCurrentBlockState(228) : setCurrentBlockState(229);
     }
 
     const int textLen = text.length();
-    if (textLen == 0) return;
+    if (textLen == 0)
+        return;
 
     setFormat(0, textLen, _formats[CodeBlock]);
 
-    for (int i = 0; i < textLen -1; ++i) {
-        if (text[i] == u'<' && text[i+1] != u'!') {
+    for (int i = 0; i < textLen - 1; ++i) {
+        if (text[i] == u'<' && text[i + 1] != u'!') {
             const int found = text.indexOf(u'>', i);
             if (found > 0) {
                 ++i;
-                if (text[i] == u'/') ++i;
+                if (text[i] == u'/')
+                    ++i;
                 setFormat(i, found - i, _formats[CodeKeyWord]);
             }
         }
 
         if (text[i] == u'=') {
             int lastSpace = text.lastIndexOf(u' ', i);
-            if (lastSpace == i-1) lastSpace = text.lastIndexOf(u' ', i-2);
+            if (lastSpace == i - 1)
+                lastSpace = text.lastIndexOf(u' ', i - 2);
             if (lastSpace > 0) {
                 setFormat(lastSpace, i - lastSpace, _formats[CodeBuiltIn]);
             }
@@ -60,16 +60,18 @@ void Highliter::highlightBlock(const QString &text)
             int cnt = 1;
             ++i;
             //bound check
-            if ( (i+1) >= textLen) return;
+            if ((i + 1) >= textLen)
+                return;
             while (i < textLen) {
                 if (text[i] == u'\"') {
                     ++cnt;
                     ++i;
                     break;
                 }
-                ++i; ++cnt;
+                ++i;
+                ++cnt;
                 //bound check
-                if ( (i+1) >= textLen) {
+                if ((i + 1) >= textLen) {
                     ++cnt;
                     break;
                 }

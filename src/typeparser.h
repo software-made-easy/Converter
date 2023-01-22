@@ -8,9 +8,9 @@ QT_BEGIN_NAMESPACE
 class QMimeType;
 class QIcon;
 class MimeType;
-template <typename T> class QList;
+template<typename T>
+class QList;
 QT_END_NAMESPACE
-
 
 class TypeParser
 {

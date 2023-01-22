@@ -3,7 +3,6 @@
 #include <QDialog>
 #include <QImage>
 
-
 class asciiart : public QDialog
 {
 public:
@@ -12,4 +11,3 @@ public:
 private:
     QString toAsciiArt(QImage *img);
 };
-

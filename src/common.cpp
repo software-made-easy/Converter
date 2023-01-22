@@ -2,7 +2,6 @@
 
 #include <QPalette>
 
-
 auto isDarkMode() -> const bool
 {
     static const QColor back = QPalette().base().color();
