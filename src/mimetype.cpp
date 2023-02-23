@@ -7,28 +7,24 @@
 
 auto MimeType::icon() const -> const QIcon
 {
+    static QHash<To, QIcon> iconHash;
+    iconHash[To::toCString] = QIcon::fromTheme(STR("text-x-csrc"),
+                                               QIcon(STR(":/icons/text-x-csrc.svg")));
+    iconHash[To::toSorted] = QIcon::fromTheme(STR("sort-name"), QIcon(STR(":/icons/sort-name.svg")));
+    iconHash[To::toPreview] = QIcon::fromTheme(STR("view-preview"),
+                                               QIcon(STR(":/icons/view-preview.svg")));
+    iconHash[To::toMD5] = QIcon(STR(":/icons/md5.svg"));
+    iconHash[To::toHTMLEscaped] = QIcon::fromTheme(STR("text-html"),
+                                                   QIcon(STR(":/icons/text-html.svg")));
+
     switch (currTo) {
     case To::toCString:
-        static const QIcon cIcon = QIcon::fromTheme(STR("text-x-csrc"),
-                                                    QIcon(STR(":/icons/text-x-csrc.svg")));
-        return cIcon;
     case To::toSorted:
-        static const QIcon sortedIcon = QIcon::fromTheme(STR("sort-name"),
-                                                         QIcon(STR(":/icons/sort-name.svg")));
-        return sortedIcon;
     case To::toPreview:
-        static const QIcon previewIcon = QIcon::fromTheme(STR("view-preview"),
-                                                          QIcon(STR(":/icons/view-preview.svg")));
-        return previewIcon;
     case To::toMD5:
-        static const QIcon md5Icon = QIcon(STR(":/icons/md5.svg"));
-        return md5Icon;
     case To::toHTMLEscaped:
-        static const QIcon htmlEscapedIcon = QIcon::fromTheme(STR("text-html"),
-                                                              QIcon(STR(":/icons/text-html.svg")));
-        return htmlEscapedIcon;
+        return iconHash[currTo];
     default:
-        static QHash<To, QIcon> iconHash;
         if (iconHash.contains(currTo))
             return iconHash[currTo];
 
