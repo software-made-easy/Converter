@@ -3,17 +3,15 @@
 
 #include <QCryptographicHash>
 #include <QObject>
-#include <QThread>
 
 #include "common.h"
 using namespace Common;
 
-class Converter : public QThread
+class Converter : public QObject
 {
     Q_OBJECT
 public:
     explicit Converter(QObject *parent = nullptr);
-    ~Converter() { quit(); };
 
     static auto markdown2HTML(const QString &, const bool) -> QString;
     static auto markdown2Plain(const QString &) -> QString;
@@ -49,7 +47,7 @@ public:
     To to = To::toInvalid;
     QString in;
 
-    void run() override;
+    void convert();
 
 Q_SIGNALS:
     void htmlReady(const QString &html);

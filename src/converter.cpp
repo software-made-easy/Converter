@@ -34,75 +34,77 @@ auto sortInsensitive(const QString &s1, const QString &s2) -> bool
 }
 
 Converter::Converter(QObject *parent)
-    : QThread{parent}
+    : QObject{parent}
 {}
 
-void Converter::run()
+void Converter::convert()
 {
-    if (from != From::NotSupportet && to != To::toInvalid) {
-        QString out;
+    if (from == From::NotSupportet || to == To::toInvalid)
+        return;
 
-        if (from == From::Markdown) {
-            switch (to) {
-            case To::toPreview:
-            case To::toHTML:
-                out = markdown2HTML(in, github);
-                break;
-            case To::toPlain:
-                out = markdown2Plain(in);
-                break;
-            default:
-                break;
-            }
-        } else if (from == From::HTML) {
-            switch (to) {
-            case To::toMarkdown:
-                out = html2Markdown(in);
-                break;
-            case To::toPlain:
-                out = html2Plain(in);
-                break;
-            case To::toPreview:
-                out = in;
-                break;
-            default:
-                break;
-            }
-        } else if (from == From::Plain) {
-            switch (to) {
-            case To::toCString:
-                out = plain2C(in);
-                break;
-            case To::toHTMLEscaped:
-                out = in.toHtmlEscaped();
-                break;
-            case To::toSorted:
-                out = plain2Sorted(in);
-                break;
-            case To::toMD5:
-                out = plain2Hash(in, QCryptographicHash::Md5);
-                break;
-            case To::toSha256:
-                out = plain2Hash(in, QCryptographicHash::Sha256);
-                break;
-            case To::toSha512:
-                out = plain2Hash(in, QCryptographicHash::Sha512);
-                break;
-            default:
-                break;
-            }
-        } else if (from == From::CString) {
-            switch (to) {
-            case To::toPlain:
-                out = c2Plain(in);
-                break;
-            default:
-                break;
-            }
+    QString out;
+
+    if (from == From::Markdown) {
+        switch (to) {
+        case To::toPreview:
+        case To::toHTML:
+            out = markdown2HTML(in, github);
+            break;
+        case To::toPlain:
+            out = markdown2Plain(in);
+            break;
+        default:
+            break;
         }
-
-        Q_EMIT htmlReady(out);
+    } else if (from == From::HTML) {
+        switch (to) {
+        case To::toMarkdown:
+            out = html2Markdown(in);
+            break;
+        case To::toPlain:
+            out = html2Plain(in);
+            break;
+        case To::toPreview:
+            out = in;
+            break;
+        default:
+            break;
+        }
+    } else if (from == From::Plain) {
+        switch (to) {
+        case To::toCString:
+            out = plain2C(in);
+            break;
+        case To::toHTMLEscaped:
+            // TODO: Rework
+            out = in.toHtmlEscaped();
+            break;
+        case To::toSorted:
+            out = plain2Sorted(in);
+            break;
+        case To::toMD5:
+            out = plain2Hash(in, QCryptographicHash::Md5);
+            break;
+        case To::toSha256:
+            out = plain2Hash(in, QCryptographicHash::Sha256);
+            break;
+        case To::toSha512:
+            out = plain2Hash(in, QCryptographicHash::Sha512);
+            break;
+        default:
+            break;
+        }
+    } else if (from == From::CString) {
+        switch (to) {
+        case To::toPlain:
+            out = c2Plain(in);
+            break;
+        default:
+            break;
+        }
     }
+
+    Q_EMIT htmlReady(out);
 }
 
 auto Converter::markdown2HTML(const QString &in, const bool git) -> QString
@@ -164,7 +166,7 @@ auto Converter::plain2C(const QString &in) const -> QString
     }
 
     if (!multiLine) {
-        out.prepend(QChar(u'"'));
+        out.prepend(u'"');
         out.append(u'"');
     }
 

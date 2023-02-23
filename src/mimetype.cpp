@@ -1,6 +1,7 @@
 #include "mimetype.h"
 #include "typeparser.h"
 
+#include <QHash>
 #include <QIcon>
 #include <QMimeType>
 
@@ -8,22 +9,38 @@ auto MimeType::icon() const -> const QIcon
 {
     switch (currTo) {
     case To::toCString:
-        return QIcon::fromTheme(STR("text-x-csrc"), QIcon(STR(":/icons/text-x-csrc.svg")));
+        static const QIcon cIcon = QIcon::fromTheme(STR("text-x-csrc"),
+                                                    QIcon(STR(":/icons/text-x-csrc.svg")));
+        return cIcon;
     case To::toSorted:
-        return QIcon::fromTheme(STR("sort-name"), QIcon(STR(":/icons/sort-name.svg")));
+        static const QIcon sortedIcon = QIcon::fromTheme(STR("sort-name"),
+                                                         QIcon(STR(":/icons/sort-name.svg")));
+        return sortedIcon;
     case To::toPreview:
-        return QIcon::fromTheme(STR("view-preview"), QIcon(STR(":/icons/view-preview.svg")));
+        static const QIcon previewIcon = QIcon::fromTheme(STR("view-preview"),
+                                                          QIcon(STR(":/icons/view-preview.svg")));
+        return previewIcon;
     case To::toMD5:
-        return QIcon(STR(":/icons/md5.svg"));
+        static const QIcon md5Icon = QIcon(STR(":/icons/md5.svg"));
+        return md5Icon;
     case To::toHTMLEscaped:
-        return QIcon::fromTheme(STR("text-html"), QIcon(STR(":/icons/text-html.svg")));
+        static const QIcon htmlEscapedIcon = QIcon::fromTheme(STR("text-html"),
+                                                              QIcon(STR(":/icons/text-html.svg")));
+        return htmlEscapedIcon;
     default:
+        static QHash<To, QIcon> iconHash;
+        if (iconHash.contains(currTo))
+            return iconHash[currTo];
+
         const QMimeType currMime = TypeParser::mimeForTo(currTo);
 
-        if (currMime.isValid())
-            return TypeParser::iconForMime(currMime);
-        else
-            return {};
+        if (currMime.isValid()) {
+            QIcon icon = TypeParser::iconForMime(currMime);
+            iconHash[currTo] = icon;
+            return icon;
+        }
+
+        return {};
     }
 }
 

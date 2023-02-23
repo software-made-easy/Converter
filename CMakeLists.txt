@@ -17,9 +17,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Build type
-if (CMAKE_BUILD_TYPE)
-    message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
-else()
+if (NOT CMAKE_BUILD_TYPE)
     message(STATUS "Build type not specified. Release is used.")
     set(CMAKE_BUILD_TYPE "Release")
 endif()

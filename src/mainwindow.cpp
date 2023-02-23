@@ -16,6 +16,7 @@
 #include <QScrollBar>
 #include <QSettings>
 #include <QTextStream>
+#include <QThread>
 #include <QTimer>
 #include <QToolButton>
 #include <QtPrintSupport/QPrinter>
@@ -34,10 +35,17 @@ auto operator<<(QTextStream &stream, const QStringList &list) -> QTextStream &
 MainWindow::MainWindow(const QString &file, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , toolbutton(new QToolButton(this))
+    , htmlHighliter(new Highliter(this))
+    , converter(new Converter())
+    , converterThread(new QThread(this))
 {
     ui->setupUi(this);
 
-    toolbutton = new QToolButton(this);
+    connect(converterThread, &QThread::finished, converterThread, &QObject::deleteLater);
+    converter->moveToThread(converterThread);
+    converterThread->start();
+
     toolbutton->setMenu(ui->menuRecentlyOpened);
     toolbutton->setPopupMode(QToolButton::InstantPopup);
 
@@ -173,9 +181,6 @@ void MainWindow::onToChanged()
 
 void MainWindow::setupThings()
 {
-    htmlHighliter = new Highliter(this);
-    converter = new Converter(this);
-
     connect(ui->from,
             qOverload<int>(&QComboBox::currentIndexChanged),
             this,
@@ -383,7 +388,7 @@ void MainWindow::onTextChanged()
 #ifdef NO_THREADING
     converter->run();
 #else
-    converter->start();
+    converter->convert();
 #endif
 }
 
@@ -619,11 +624,6 @@ void MainWindow::onDetectFile()
 
 void MainWindow::detectFile(const QString &fileName, const QByteArray &fileContents)
 {
-    if (fileName.isEmpty()) {
-        onDetectFile();
-        return;
-    }
-
     static QMimeDatabase mimeDatabase;
     const QFileInfo fi(fileName);
     const QMimeType mimeType = mimeDatabase.mimeTypeForFileNameAndData(fileName, fileContents);
@@ -741,4 +741,10 @@ void MainWindow::saveSettings()
 MainWindow::~MainWindow()
 {
     delete ui;
+
+    converterThread->quit();
+    converterThread->wait();
+
+    converter->deleteLater();
+    delete converter;
 }

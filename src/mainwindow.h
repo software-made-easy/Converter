@@ -13,6 +13,7 @@ class QToolButton;
 class Highliter;
 class Converter;
 class QMimeType;
+class QThread;
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
@@ -81,6 +82,7 @@ private:
     QToolButton *toolbutton;
 
     Converter *converter;
+    QThread *converterThread;
 
     Highliter *htmlHighliter;
 };
